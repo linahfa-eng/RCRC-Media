@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>متابعة الاجتماع الأسبوعي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f4f2;
+  --surface:#ffffff;
+  --surface2:#f5faf7;
+  --border:#d0ddd7;
+  --border-soft:#dce8e1;
+  --ink:#0d1f17;
+  --ink2:#3a5248;
+  --ink3:#7a9e8e;
+  --accent:#0d4a2f;
+  --accent-light:#e0f0e8;
+  --accent2:#B59D61;
+  --green:#0d6640;
+  --green-bg:#e0f2e9;
+  --amber:#8a6a00;
+  --amber-bg:#fef6d8;
+  --blue:#0d4a2f;
+  --blue-bg:#e0f0e8;
+  --red:#7a1c1c;
+  --red-bg:#fdeaea;
+  --gray:#4a5a52;
+  --gray-bg:#edf2ef;
+  --gold:#B59D61;
+  --gold-bg:#faf5e8;
+  --r:10px;
+  --r-lg:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+}
+body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.6}
+
+/* ── NAV ── */
+.nav{background:var(--accent);display:flex;align-items:stretch;padding:0 2rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.nav-brand{color:#fff;font-size:16px;font-weight:700;padding:1rem 0;flex:1;display:flex;align-items:center;gap:10px}
+.nav-brand span{opacity:.6;font-weight:300;font-size:13px}
+.nav-tabs{display:flex;gap:0}
+.nav-tab{color:rgba(255,255,255,.65);font-family:'Tajawal',sans-serif;font-size:14px;font-weight:500;padding:0 1.25rem;border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;display:flex;align-items:center;gap:6px}
+.nav-tab:hover{color:#fff}
+.nav-tab.active{color:#fff;border-bottom-color:#B59D61}
+.nav-date{color:rgba(255,255,255,.5);font-size:12px;padding:0 1rem;display:flex;align-items:center}
+
+/* ── PAGES ── */
+.page{display:none}
+.page.active{display:block}
+
+/* ══════════════════════════════════
+   DASHBOARD PAGE
+══════════════════════════════════ */
+.dash-header{padding:2rem 2.5rem 1.5rem;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.dash-header h1{font-size:26px;font-weight:800;color:var(--ink)}
+.dash-header p{font-size:13px;color:var(--ink2);margin-top:2px}
+.dash-week-badge{background:var(--accent);color:#fff;font-size:12px;padding:6px 16px;border-radius:30px;white-space:nowrap}
+
+.dash-grid{padding:0 2.5rem 2.5rem;display:flex;flex-direction:column;gap:1.5rem}
+
+/* KPI row */
+.kpi-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.1rem 1.25rem;position:relative;overflow:hidden}
+.kpi::after{content:'';position:absolute;top:0;right:0;width:4px;height:100%;border-radius:0 var(--r-lg) var(--r-lg) 0}
+.kpi.k-total::after{background:var(--accent)}
+.kpi.k-prog::after{background:var(--blue)}
+.kpi.k-open::after{background:var(--amber)}
+.kpi.k-done::after{background:var(--green)}
+.kpi.k-high::after{background:var(--red)}
+.kpi.k-depts::after{background:var(--ink3)}
+.kpi-label{font-size:11px;color:var(--ink3);font-weight:500;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px}
+.kpi-num{font-size:28px;font-weight:800;line-height:1}
+.kpi-sub{font-size:11px;color:var(--ink3);margin-top:4px}
+
+/* Two-col layout */
+.dash-two{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.25rem 1.5rem;box-shadow:var(--shadow)}
+.dash-card-title{font-size:13px;font-weight:700;color:var(--ink2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:1.1rem;display:flex;align-items:center;gap:8px}
+.dash-card-title .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* Bar chart */
+.dept-bar-item{margin-bottom:14px}
+.dept-bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.dept-bar-name{font-size:13px;color:var(--ink);font-weight:500}
+.dept-bar-val{font-size:12px;color:var(--ink3)}
+.bar-track{height:8px;background:var(--bg);border-radius:20px;overflow:hidden}
+.bar-fill{height:100%;border-radius:20px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+/* Status donut */
+.donut-wrap{display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap}
+.donut-legend{display:flex;flex-direction:column;gap:10px;min-width:160px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:13px}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.legend-label{flex:1;color:var(--ink2)}
+.legend-val{font-weight:700;color:var(--ink);min-width:20px;text-align:left}
+.legend-pct{font-size:11px;color:var(--ink3);min-width:32px;text-align:left}
+
+/* Priority breakdown */
+.prio-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.prio-label{width:60px;font-size:12px;color:var(--ink2)}
+.prio-bar-wrap{flex:1;height:20px;background:var(--bg);border-radius:6px;overflow:hidden;display:flex}
+.prio-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;transition:width .6s}
+
+/* Dept status matrix */
+.matrix-table{width:100%;border-collapse:collapse;font-size:12px}
+.matrix-table th{text-align:right;padding:6px 8px;color:var(--ink3);font-weight:500;border-bottom:1px solid var(--border-soft)}
+.matrix-table td{padding:7px 8px;border-bottom:1px solid var(--border-soft);vertical-align:middle}
+.matrix-table tr:last-child td{border-bottom:none}
+.matrix-table tr:hover td{background:var(--surface2)}
+.dept-name-sm{font-weight:500;color:var(--ink);font-size:12px}
+.owner-sm{font-size:11px;color:var(--ink3)}
+.mini-badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;min-width:22px;text-align:center}
+.mb-prog{background:var(--blue-bg);color:var(--blue)}
+.mb-open{background:var(--amber-bg);color:var(--amber)}
+.mb-done{background:var(--green-bg);color:var(--green)}
+.mb-close{background:#d1fae5;color:#065f46}
+
+/* Activity feed */
+.summary-boxes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.summary-box{border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.summary-box-hdr{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;margin-bottom:4px}
+.summary-box-hdr .sb-icon{font-size:16px}
+.summary-box-hdr .sb-count{font-size:18px;font-weight:800;margin-right:auto}
+.summary-box-item{font-size:11px;padding:4px 6px;border-radius:6px;background:rgba(255,255,255,.6);color:#333;line-height:1.4}
+.summary-box-item .sb-dept{font-size:10px;opacity:.7;margin-top:1px}
+.summary-box-empty{font-size:11px;opacity:.5;text-align:center;padding:8px}
+.sb-new{background:#e8f5e9;border:1px solid #a5d6a7}
+.sb-done{background:#e3f2fd;border:1px solid #90caf9}
+.sb-changed{background:#fff8e1;border:1px solid #ffe082}
+.sb-transfer{background:#f3e5f5;border:1px solid #ce93d8}
+.feed-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-soft)}
+.feed-item:last-child{border-bottom:none}
+.feed-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.feed-content{flex:1}
+.feed-title{font-size:13px;font-weight:500;color:var(--ink);line-height:1.3}
+.feed-meta{font-size:11px;color:var(--ink3);margin-top:2px}
+
+/* ══════════════════════════════════
+   TRACKER PAGE
+══════════════════════════════════ */
+.tracker-header{padding:1.75rem 2rem 1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.tracker-header h1{font-size:20px;font-weight:700}
+.add-task-btn{font-family:'Tajawal',sans-serif;font-size:13px;background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:30px;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:6px;transition:opacity .2s}
+.add-task-btn:hover{opacity:.88}
+
+/* Filter bar */
+.filter-bar{padding:.75rem 2rem;border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.filter-lbl{font-size:12px;color:var(--ink3);min-width:50px;flex-shrink:0}
+.fbtn{font-family:'Tajawal',sans-serif;font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--ink2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.fbtn:hover{border-color:var(--accent);color:var(--accent)}
+.fbtn.fs-active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.fbtn.fd-active{background:var(--surface2);color:var(--ink);border-color:var(--ink3);font-weight:600}
+
+/* Search */
+.search-wrap{padding:.75rem 2rem;background:var(--surface2);border-bottom:1px solid var(--border-soft)}
+.search-input{font-family:'Tajawal',sans-serif;font-size:14px;width:100%;max-width:400px;padding:8px 14px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s}
+.search-input:focus{border-color:var(--accent)}
+.search-input::placeholder{color:var(--ink3)}
+
+/* Dept cards */
+.dept-list{padding:1.25rem 2rem;display:flex;flex-direction:column;gap:1rem}
+.dept-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .2s}
+.dept-card.hidden{display:none}
+.dept-card:hover{box-shadow:0 2px 20px rgba(0,0,0,.08)}
+
+.dept-hdr{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;cursor:pointer;user-select:none}
+.dept-hdr-left{display:flex;align-items:center;gap:12px}
+.dept-num{width:32px;height:32px;border-radius:9px;background:var(--accent-light);color:var(--accent);font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dept-name{font-size:15px;font-weight:700}
+.dept-owner{font-size:12px;color:var(--ink2);margin-top:1px}
+.dept-hdr-right{display:flex;align-items:center;gap:10px}
+.task-count{font-size:12px;color:var(--ink3);background:var(--bg);border:1px solid var(--border-soft);padding:3px 10px;border-radius:20px}
+.chev{font-size:11px;color:var(--ink3);transition:transform .2s;display:inline-block}
+.chev.open{transform:rotate(180deg)}
+
+.dept-body{overflow:hidden}
+
+/* Table */
+.tasks-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tasks-tbl th{text-align:right;padding:.5rem 1rem;font-size:11px;font-weight:600;color:var(--ink3);background:var(--surface2);border-bottom:1px solid var(--border-soft);letter-spacing:.3px}
+.tasks-tbl td{padding:.65rem 1rem;border-bottom:1px solid var(--border-soft);vertical-align:middle}
+.tasks-tbl tr:last-child td{border-bottom:none}
+.tasks-tbl tr.task-row:hover td{background:var(--surface2)}
+.task-name{font-weight:500;line-height:1.4}
+.task-comment{font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.5}
+.task-actions{display:flex;gap:6px;opacity:0;transition:opacity .15s}
+.task-row:hover .task-actions{opacity:1}
+.tbl-btn{font-family:'Tajawal',sans-serif;font-size:11px;padding:3px 9px;border-radius:6px;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--ink2);transition:all .15s}
+.tbl-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tbl-btn.del-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* Badges */
+.badge{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap}
+.s-prog{background:var(--blue-bg);color:var(--blue)}
+.s-open{background:var(--amber-bg);color:var(--amber)}
+.s-comp{background:var(--green-bg);color:var(--green)}
+.s-closed{background:#d1fae5;color:#065f46}
+.s-late{background:var(--red-bg);color:var(--red)}
+.s-hold{background:var(--gray-bg);color:var(--gray)}
+.p-high{background:#fde8e8;color:#8f1c1c}
+.p-med{background:var(--amber-bg);color:var(--amber)}
+.p-low{background:var(--green-bg);color:var(--green)}
+
+/* Inline selects */
+.status-sel,.prio-sel{font-family:'Tajawal',sans-serif;font-size:11.5px;border:1px solid var(--border);border-radius:6px;padding:3px 6px;background:var(--surface);color:var(--ink);cursor:pointer;outline:none}
+.status-sel:focus,.prio-sel:focus{border-color:var(--accent)}
+
+.no-tasks{padding:1.25rem;text-align:center;font-size:13px;color:var(--ink3)}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--surface);border-radius:var(--r-lg);padding:1.75rem;width:100%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:1.25rem}
+.form-row{margin-bottom:1rem}
+.form-label{font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:5px;display:block;letter-spacing:.3px}
+.form-input,.form-select,.form-textarea{font-family:'Tajawal',sans-serif;font-size:14px;width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
+.form-textarea{resize:vertical;min-height:80px}
+.form-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:1.5rem}
+.btn-primary{font-family:'Tajawal',sans-serif;font-size:14px;background:var(--accent);color:#fff;border:none;padding:9px 22px;border-radius:var(--r);cursor:pointer;font-weight:600;transition:opacity .2s}
+.btn-primary:hover{opacity:.88}
+.btn-cancel{font-family:'Tajawal',sans-serif;font-size:14px;background:transparent;color:var(--ink2);border:1px solid var(--border);padding:9px 18px;border-radius:var(--r);cursor:pointer}
+.btn-cancel:hover{background:var(--bg)}
+
+/* ── EDIT inline ── */
+.inline-edit{display:none;font-family:'Tajawal',sans-serif;font-size:13px;width:100%;border:1px solid var(--accent);border-radius:6px;padding:4px 8px;background:var(--surface);color:var(--ink);outline:none}
+.comment-edit{font-family:'Tajawal',sans-serif;font-size:12px;width:100%;border:1px solid var(--accent);border-radius:6px;padding:4px 8px;background:var(--surface);color:var(--ink2);resize:vertical;outline:none;display:none}
+
+/* ── NEXT STAGE ── */
+.next-stage-wrap{margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.next-stage-label{font-size:11px;color:var(--ink3);white-space:nowrap}
+.next-stage-badge{display:inline-flex;align-items:center;gap:5px;background:#f0f4ff;border:1px solid #c7d5f0;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:600;color:var(--accent);white-space:nowrap}
+.next-stage-badge .ns-arrow{font-size:10px;opacity:.6}
+.next-stage-input-wrap{display:inline-flex;align-items:center;gap:4px}
+.next-stage-input{font-family:'Tajawal',sans-serif;font-size:11px;border:1px dashed var(--border);border-radius:6px;padding:2px 8px;background:var(--surface);color:var(--ink);outline:none;width:120px;transition:border-color .15s}
+.next-stage-input:focus{border-color:var(--accent);border-style:solid}
+.ns-save-btn{font-family:'Tajawal',sans-serif;font-size:10px;background:var(--accent);color:#fff;border:none;padding:2px 8px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.ns-save-btn:hover{opacity:.85}
+.ns-clear-btn{font-size:10px;background:none;border:none;color:var(--ink3);cursor:pointer;padding:2px 4px;line-height:1}
+.ns-clear-btn:hover{color:var(--red)}
+
+/* ── TOAST ── */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loadingOverlay{
+  position:fixed;inset:0;background:rgba(13,26,19,.85);
+  z-index:999;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;
+  transition:opacity .3s;
+}
+#loadingOverlay.hidden{opacity:0;pointer-events:none;}
+#loadingOverlay .spinner{
+  width:40px;height:40px;border-radius:50%;
+  border:3px solid rgba(181,157,97,.2);
+  border-top-color:#B59D61;
+  animation:spin .8s linear infinite;
+}
+#loadingOverlay .load-text{color:#B59D61;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:500;}
+/* Password Screen */
+#passwordScreen{position:fixed;inset:0;background:linear-gradient(135deg,#0a3520 0%,#0d4a2f 60%,#1a6b45 100%);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:'Tajawal',sans-serif}
+#passwordScreen.hidden{display:none}
+.pw-logo{height:50px;opacity:.9;margin-bottom:10px}
+.pw-title{color:#B59D61;font-size:22px;font-weight:800;letter-spacing:.5px}
+.pw-sub{color:rgba(255,255,255,.5);font-size:13px;margin-top:-10px}
+.pw-input{font-family:'Tajawal',sans-serif;font-size:15px;background:rgba(255,255,255,.08);border:1.5px solid rgba(181,157,97,.4);border-radius:12px;padding:12px 20px;color:#fff;outline:none;width:280px;text-align:center;letter-spacing:2px}
+.pw-input:focus{border-color:#B59D61;background:rgba(255,255,255,.12)}
+.pw-input::placeholder{color:rgba(255,255,255,.3);letter-spacing:0}
+.pw-btn{font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;background:linear-gradient(135deg,#B59D61,#d4b87a);color:#0d2b1e;border:none;border-radius:12px;padding:12px 40px;cursor:pointer;transition:opacity .2s;width:280px}
+.pw-btn:hover{opacity:.88}
+.pw-error{color:#f87171;font-size:13px;min-height:18px}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;font-size:13px;padding:10px 20px;border-radius:30px;opacity:0;transition:all .3s;z-index:300;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .kpi-row{grid-template-columns:repeat(3,1fr)}
+  .dash-two{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .dash-grid,.tracker-header,.filter-bar,.dept-list,.search-wrap,.dash-grid,.dash-header{padding-right:1rem;padding-left:1rem}
+  .tasks-tbl th:nth-child(4),.tasks-tbl td:nth-child(4){display:none}
+}
+
+/* ══ CALENDAR ══ */
+.cal-page-header{padding:1.75rem 2rem 1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.cal-page-header h1{font-size:20px;font-weight:700}
+.cal-body{padding:0 2rem 2rem;display:flex;flex-direction:column;gap:2rem}
+.cal-week-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
+.cal-week-title{padding:.9rem 1.25rem;background:linear-gradient(135deg,#0a3520,#0d4a2f);color:#fff;display:flex;align-items:center;justify-content:space-between}
+.cal-week-title.next-week{background:linear-gradient(135deg,#0d4a2f,#1a6b45)}
+.cal-week-title h2{font-size:15px;font-weight:700}
+.cal-week-title span{font-size:12px;opacity:.75}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-day-col{border-left:1px solid var(--border-soft);min-height:320px;display:flex;flex-direction:column}
+.cal-day-col:last-child{border-left:none}
+.cal-day-hdr{padding:.55rem .75rem;background:var(--surface2);border-bottom:1px solid var(--border-soft);display:flex;align-items:baseline;justify-content:space-between;gap:4px}
+.cal-day-name{font-size:10px;font-weight:700;color:var(--ink2);letter-spacing:.4px}
+.cal-day-num{font-size:20px;font-weight:800;color:var(--ink);line-height:1}
+.cal-day-col.today .cal-day-hdr{background:var(--accent)}
+.cal-day-col.today .cal-day-name{color:rgba(255,255,255,.8)}
+.cal-day-col.today .cal-day-num{color:#fff}
+.cal-events{padding:.4rem .4rem;display:flex;flex-direction:column;gap:4px;flex:1}
+.cal-event{border-radius:6px;padding:5px 8px;font-size:11px;line-height:1.35;cursor:pointer;transition:filter .15s;border-right:3px solid transparent}
+.cal-event:hover{filter:brightness(.93)}
+.cal-event-title{font-weight:600;color:var(--ink);word-break:break-word}
+.cal-event-meta{font-size:10px;color:var(--ink2);margin-top:1px}
+.cal-event.ev-blue{background:#e5eef8;border-right-color:#154d8a}
+.cal-event.ev-amber{background:#fef3dc;border-right-color:#8a4f00}
+.cal-event.ev-green{background:#e6f4ee;border-right-color:#1a6b45}
+.cal-event.ev-red{background:#fdeaea;border-right-color:#8f1c1c}
+.cal-event.ev-purple{background:#f3eeff;border-right-color:#6b2fa0}
+.cal-event.ev-gray{background:#f0f0f0;border-right-color:#4a4a4a}
+.cal-add-btn{margin:.4rem;font-family:'Tajawal',sans-serif;font-size:11px;color:var(--ink3);background:none;border:1px dashed var(--border);border-radius:6px;padding:4px;cursor:pointer;width:calc(100% - .8rem);text-align:center;transition:all .15s}
+.cal-add-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.cal-empty{font-size:11px;color:var(--ink3);text-align:center;padding:.75rem .4rem;opacity:.5}
+/* Event modal */
+.ev-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center;padding:1rem}
+.ev-modal-overlay.hidden{display:none}
+.ev-modal{background:var(--surface);border-radius:var(--r-lg);padding:1.5rem;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.ev-modal h2{font-size:16px;font-weight:700;margin-bottom:1rem}
+.ev-color-row{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+.ev-color-opt{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s;flex-shrink:0}
+.ev-color-opt.sel{border-color:var(--ink);transform:scale(1.2)}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD SCREEN -->
+<div id="passwordScreen">
+  <img class="pw-logo" src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjE0Ljc1IDczLjk5IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBpZD0iTGF5ZXJfMiIgb3ZlcmZsb3c9ImhpZGRlbiI+PHN0eWxlPg0KLk1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiB7DQogZmlsbDojRkZGRkZGOyANCn0NCjwvc3R5bGU+DQo8ZGVmcz48L2RlZnM+PGcgaWQ9IkxheWVyXzEtMiI+PGc+PHJlY3QgeD0iOS4wMiIgeT0iNDkuMTkiIHdpZHRoPSIxLjciIGhlaWdodD0iMS43OCIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMS44OSA1NS40OSAxMS44OSA1Ni43IDcuMzQgNTYuNyA3LjM0IDU2LjIyQzcuNjkgNTUuNTIgOC4xNSA1NC44OCA4LjcgNTQuMzQgOS4yNCA1My44IDkuODEgNTMuNTMgMTAuMzggNTMuNTMgMTAuODYgNTMuNTMgMTEuMjMgNTMuNzEgMTEuNDkgNTQuMDkgMTEuNzYgNTQuNDcgMTEuODkgNTQuOTQgMTEuODkgNTUuNDlNMTAuNzYgNTEuODVDMTAuMjEgNTEuODUgOS43MyA1MS45NSA5LjMxIDUyLjEzIDguOSA1Mi4zMSA4LjUzIDUyLjU2IDguMjIgNTIuODYgNy45NSA1My4xMiA3LjY2IDUzLjQzIDcuMzQgNTMuODNMNy4zNCA1MS45OCA1LjUxIDUxLjk4IDUuNTEgNTguMzNDNS41MSA1OC41OCA1LjQ0IDU4LjgyIDUuMyA1OS4wNCA1LjE2IDU5LjI2IDQuOTQgNTkuNDUgNC42NyA1OS41OCA0LjM5IDU5LjcyIDQuMDUgNTkuNzkgMy42NiA1OS43OSAzLjIzIDU5Ljc5IDIuODcgNTkuNzEgMi41OSA1OS41NSAyLjMyIDU5LjM5IDIuMTIgNTkuMTggMiA1OC45NCAxLjg4IDU4LjcgMS44MiA1OC40NiAxLjgyIDU4LjIyIDEuODIgNTcuODYgMiA1Ni43NSAyLjM0IDU0LjkxTDIuMzYgNTQuODIgMC42NyA1NC43MyAwLjYgNTQuNzNDMC42IDU0LjczIDAuNTkgNTQuNzkgMC41OSA1NC43OSAwLjQ0IDU1LjUxIDAuMzEgNTYuMjMgMC4yMSA1Ni45NCAwLjEgNTcuNjkgMC4wNCA1OC4yMSAwLjA0IDU4LjUzIDAuMDQgNTguOTUgMC4xNCA1OS4zOCAwLjM1IDU5LjgyIDAuNTYgNjAuMjcgMC45MyA2MC42NiAxLjQ3IDYwLjk4IDIuMDEgNjEuMyAyLjc1IDYxLjQ2IDMuNjcgNjEuNDYgNC41IDYxLjQ2IDUuMTkgNjEuMzMgNS43MyA2MS4wNiA2LjI4IDYwLjc5IDYuNjkgNjAuNDUgNi45NSA2MC4wNSA3LjIxIDU5LjY0IDcuMzQgNTkuMjIgNy4zNCA1OC43OUw3LjM0IDU4LjM3IDEzLjcyIDU4LjM3IDEzLjcyIDU1LjE1QzEzLjcyIDU0LjI3IDEzLjUgNTMuNDkgMTMuMDUgNTIuODQgMTIuNiA1Mi4xOCAxMS44MyA1MS44NCAxMC43NSA1MS44NCIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjE5LjM0IiB5PSI1OS4yMiIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjIxLjIzIiB5PSI1OS4yMiIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0yMS45IDUxLjk3IDIwLjA3IDUxLjk3IDIwLjA3IDU2LjY5IDE3LjE1IDU2LjY5IDE3LjE1IDQ5LjQ3IDE1LjMxIDQ5LjQ3IDE1LjMxIDU4LjM4IDIxLjkgNTguMzggMjEuOSA1MS45N1oiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMzIuNzggNTYuNjkgMjcuMDMgNTYuNjkgMjcuMDMgNTEuOTcgMjUuMiA1MS45NyAyNS4yIDU4LjUxQzI1LjIgNTguOTMgMjUuMTMgNTkuMjUgMjQuOTkgNTkuNDcgMjQuODYgNTkuNjggMjQuNjYgNTkuNzkgMjQuMzkgNTkuNzlMMjMuODggNTkuNzYgMjMuODggNjEuNDIgMjMuOTUgNjEuNDJDMjQuNDQgNjEuNDYgMjQuNzUgNjEuNDcgMjQuODcgNjEuNDcgMjUuNTkgNjEuNDcgMjYuMTMgNjEuMTkgMjYuNDkgNjAuNjIgMjYuODMgNjAuMDggMjcuMDIgNTkuMzMgMjcuMDMgNTguMzdMMzQuNjEgNTguMzcgMzQuNjEgNDkuNDcgMzIuNzggNDkuNDcgMzIuNzggNTYuNjlaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHJlY3QgeD0iMzYuNDUiIHk9IjQ5LjQ3IiB3aWR0aD0iMS44MyIgaGVpZ2h0PSI4LjkiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSI0NS43NyIgeT0iNDkuMjUiIHdpZHRoPSIxLjQ1IiBoZWlnaHQ9IjEuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSI0Ny42NyIgeT0iNDkuMjUiIHdpZHRoPSIxLjQ1IiBoZWlnaHQ9IjEuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSI1Ny41IiB5PSI0OS4xOSIgd2lkdGg9IjEuNyIgaGVpZ2h0PSIxLjc4IiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHJlY3QgeD0iNjIuMTIiIHk9IjU5LjIyIiB3aWR0aD0iMS40NCIgaGVpZ2h0PSIxLjcyIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHJlY3QgeD0iNjQuMDIiIHk9IjU5LjIyIiB3aWR0aD0iMS40NSIgaGVpZ2h0PSIxLjcyIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PGc+PHBhdGggZD0iTTQ1LjgxIDU0LjFDNDUuOTIgNTMuODkgNDYuMDkgNTMuNzQgNDYuMzIgNTMuNjYgNDYuNTYgNTMuNTcgNDYuOTEgNTMuNTMgNDcuMzYgNTMuNTMgNDcuODEgNTMuNTMgNDguMiA1My41NSA0OC41OSA1My41OUw0OC41OSA1Ni43IDQ3LjMyIDU2LjdDNDYuOSA1Ni43IDQ2LjU2IDU2LjY2IDQ2LjMyIDU2LjU3IDQ2LjA5IDU2LjQ4IDQ1LjkyIDU2LjMzIDQ1LjgxIDU2LjExIDQ1LjY5IDU1Ljg3IDQ1LjY0IDU1LjUzIDQ1LjY0IDU1LjA4IDQ1LjY0IDU0LjY2IDQ1LjcgNTQuMzQgNDUuODEgNTQuMTJNNjQuNjkgNTEuOTcgNjIuODYgNTEuOTcgNjIuODYgNTYuNjkgNTkuMjkgNTYuNjkgNTkuMjkgNTEuOTcgNTcuNDYgNTEuOTcgNTcuNDYgNTYuNjkgNTAuNDMgNTYuNjkgNTAuNDMgNTIuMDIgNTAuMzYgNTIuMDJDNTAuMDkgNTEuOTcgNDkuNjIgNTEuOTMgNDguOTggNTEuOSA0OC4zNSA1MS44NyA0Ny43OSA1MS44NSA0Ny4zIDUxLjg1IDQ2LjQyIDUxLjg1IDQ1LjczIDUxLjk0IDQ1LjI0IDUyLjEyIDQ0Ljc0IDUyLjMxIDQ0LjM3IDUyLjY0IDQ0LjE1IDUzLjEgNDMuOTMgNTMuNTUgNDMuODIgNTQuMjEgNDMuODIgNTUuMDYgNDMuODIgNTUuOTEgNDMuOTQgNTYuNjQgNDQuMTcgNTcuMTEgNDQuNDEgNTcuNTkgNDQuNzggNTcuOTIgNDUuMjcgNTguMSA0NS43NSA1OC4yOCA0Ni40MiA1OC4zNyA0Ny4yNSA1OC4zN0w2NC43MSA1OC4zNyA2NC43MSA1MS45N1oiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNODUuNjEgNTUuMTQgODUuNjEgNTYuNyA4My4xNCA1Ni43QzgzLjExIDU2LjUzIDgzLjA3IDU2LjMyIDgzLjA0IDU2LjA1IDgzIDU1Ljc2IDgyLjk4IDU1LjQ3IDgyLjk4IDU1LjE5IDgyLjk4IDU0LjczIDgzLjAzIDU0LjIgODMuMTQgNTMuNjEgODMuNDMgNTMuNTUgODMuNzMgNTMuNTIgODQuMDIgNTMuNTIgODQuNjQgNTMuNTIgODUuMDYgNTMuNjUgODUuMjggNTMuOTEgODUuNDkgNTQuMTcgODUuNiA1NC41OCA4NS42IDU1LjE0TTkwLjE5IDU2LjY5IDg4LjA1IDU2LjY5Qzg3LjkyIDU2LjY5IDg3LjgxIDU2LjY1IDg3LjcgNTYuNTYgODcuNTkgNTYuNDggODcuNTEgNTYuMzcgODcuNDYgNTYuMjJMODcuNDYgNTUuMTdDODcuNDYgNTQuNDIgODcuMzggNTMuODEgODcuMjEgNTMuMzUgODcuMDQgNTIuODcgODYuNzEgNTIuNSA4Ni4yNCA1Mi4yNCA4NS43NyA1MS45OSA4NS4wOSA1MS44NiA4NC4yMiA1MS44NiA4My42NyA1MS44NiA4My4xNyA1MS45IDgyLjczIDUxLjk5IDgyLjI4IDUyLjA3IDgxLjk0IDUyLjE3IDgxLjcxIDUyLjI4TDgxLjY4IDUyLjMgODEuNjggNTIuMzNDODEuNTUgNTIuNzIgODEuNDQgNTMuMTggODEuMzYgNTMuNyA4MS4yNyA1NC4yMyA4MS4yMiA1NC43MyA4MS4yMiA1NS4xOSA4MS4yMiA1NS42NSA4MS4yNyA1Ni4xNCA4MS4zOCA1Ni43TDcxLjc3IDU2LjcgNzEuNzcgNTYuMTdDNzEuNzcgNTUuMjEgNzEuNjMgNTQuMzggNzEuMzUgNTMuNzEgNzEuMDcgNTMuMDQgNzAuNjYgNTIuNTMgNzAuMTUgNTIuMiA2OS42NCA1MS44NiA2OS4wMyA1MS42OSA2OC4zNSA1MS42OSA2OC4wNyA1MS42OSA2Ny43NyA1MS43MSA2Ny40MyA1MS43NiA2Ny4wOSA1MS44MSA2Ni44IDUxLjg2IDY2LjU1IDUxLjkyTDY2LjQ4IDUxLjk0IDY2LjYxIDUzLjMyIDY2LjYxIDUzLjM5IDY3Ljk1IDUzLjM5QzY4LjQ5IDUzLjM5IDY4Ljk2IDUzLjYyIDY5LjM1IDU0LjA2IDY5Ljc0IDU0LjUgNjkuOTQgNTUuMjcgNjkuOTQgNTYuMzJMNjkuOTQgNTYuNjkgNjUuOTMgNTYuNjkgNjUuOTMgNTguMzcgODcuNDcgNTguMzcgODcuNDcgNTguMDZDODcuNTEgNTguMTEgODcuNTYgNTguMTYgODcuNjIgNTguMjEgODcuNzYgNTguMzIgODcuOTEgNTguMzggODguMDcgNTguMzhMOTIuMDUgNTguMzggOTIuMDUgNDkuNDggOTAuMjIgNDkuNDggOTAuMjIgNTYuN1oiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48L2c+PHJlY3QgeD0iMTAxLjQxIiB5PSI0OS4yNSIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9Ijk5LjUyIiB5PSI0OS4yNSIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjEwNi40IiB5PSI1OS4yMiIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjEwOC4zIiB5PSI1OS4yMiIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMDIuMzQgNTMuNTkgMTAyLjM0IDU2LjcgMTAxLjA3IDU2LjdDMTAwLjY1IDU2LjcgMTAwLjMxIDU2LjY2IDEwMC4wNyA1Ni41NyA5OS44NCA1Ni40OCA5OS42NyA1Ni4zMyA5OS41NiA1Ni4xIDk5LjQ0IDU1Ljg3IDk5LjM5IDU1LjUyIDk5LjM5IDU1LjA3IDk5LjM5IDU0LjY1IDk5LjQ1IDU0LjMzIDk5LjU2IDU0LjExIDk5LjY2IDUzLjkgOTkuODQgNTMuNzUgMTAwLjA3IDUzLjY3IDEwMC4zMSA1My41OCAxMDAuNjYgNTMuNTQgMTAxLjExIDUzLjU0IDEwMS41NiA1My41NCAxMDEuOTUgNTMuNTYgMTAyLjM0IDUzLjU5TTE0NS40MiA1NS4xNCAxNDUuNDIgNTYuNyAxNDIuOTUgNTYuN0MxNDIuOTEgNTYuNTMgMTQyLjg4IDU2LjMyIDE0Mi44NSA1Ni4wNSAxNDIuODEgNTUuNzYgMTQyLjc5IDU1LjQ3IDE0Mi43OSA1NS4xOSAxNDIuNzkgNTQuNzMgMTQyLjg0IDU0LjIgMTQyLjk1IDUzLjYxIDE0My4yNCA1My41NSAxNDMuNTQgNTMuNTIgMTQzLjgzIDUzLjUyIDE0NC40NSA1My41MiAxNDQuODcgNTMuNjUgMTQ1LjA5IDUzLjkxIDE0NS4zMSA1NC4xNyAxNDUuNDIgNTQuNTggMTQ1LjQyIDU1LjE0TTE0OS45OSA1Ni42OSAxNDcuODUgNTYuNjlDMTQ3LjczIDU2LjY5IDE0Ny42MSA1Ni42NSAxNDcuNSA1Ni41NiAxNDcuMzkgNTYuNDggMTQ3LjMxIDU2LjM2IDE0Ny4yNiA1Ni4yMkwxNDcuMjYgNTUuMTdDMTQ3LjI2IDU0LjQyIDE0Ny4xOCA1My44MSAxNDcuMDEgNTMuMzUgMTQ2Ljg0IDUyLjg3IDE0Ni41MSA1Mi41IDE0Ni4wMyA1Mi4yNCAxNDUuNTYgNTEuOTkgMTQ0Ljg4IDUxLjg2IDE0NC4wMSA1MS44NiAxNDMuNDYgNTEuODYgMTQyLjk2IDUxLjkgMTQyLjUyIDUxLjk5IDE0Mi4wNyA1Mi4wNyAxNDEuNzMgNTIuMTcgMTQxLjUgNTIuMjhMMTQxLjQ3IDUyLjMgMTQxLjQ3IDUyLjMzQzE0MS4zNCA1Mi43MSAxNDEuMjQgNTMuMTYgMTQxLjE1IDUzLjcgMTQxLjA2IDU0LjIzIDE0MS4wMSA1NC43MyAxNDEuMDEgNTUuMTkgMTQxLjAxIDU1LjY1IDE0MS4wNiA1Ni4xNCAxNDEuMTcgNTYuN0wxMjguNTIgNTYuNyAxMjguNTIgNDkuNDggMTI2LjY5IDQ5LjQ4IDEyNi42OSA1Ni43IDEyMy42NSA1Ni43IDEyMy42NSA1NS4yNUMxMjMuNjUgNTQuODYgMTIzLjU5IDU0LjQzIDEyMy40NyA1My45NyAxMjMuMzUgNTMuNTEgMTIzLjEgNTMuMDkgMTIyLjczIDUyLjcyIDEyMi4zNiA1Mi4zNSAxMjEuODIgNTIuMTYgMTIxLjEzIDUyLjE2TDExOC43OSA1Mi4xNiAxMTguOTUgNTEuODRDMTE5LjMzIDUxLjEyIDExOS43NCA1MC40NSAxMjAuMTcgNDkuODRMMTIwLjIyIDQ5Ljc3IDExOC44NSA0OSAxMTguODEgNDkuMDVDMTE4LjU2IDQ5LjMzIDExOC4yOCA0OS42NiAxMTguMDEgNTAuMDQgMTE3LjcyIDUwLjQzIDExNy41IDUwLjc4IDExNy4zMyA1MS4xMkwxMTYuNTggNTIuNTggMTE2LjU2IDUyLjYyIDExNy40NyA1My44NSAxMjAuODYgNTMuODVDMTIxLjEyIDUzLjg1IDEyMS4zNCA1My45NyAxMjEuNTIgNTQuMjMgMTIxLjcxIDU0LjQ5IDEyMS44MSA1NC44MyAxMjEuODEgNTUuMjVMMTIxLjgxIDU2LjcxIDEwOSA1Ni43MSAxMDkgNTEuOTkgMTA3LjE3IDUxLjk5IDEwNy4xNyA1Ni43MSAxMDQuMTcgNTYuNzEgMTA0LjE3IDUyLjA0IDEwNC4xIDUyLjA0QzEwMy44MyA1MS45OSAxMDMuMzYgNTEuOTUgMTAyLjcyIDUxLjkyIDEwMi4wOSA1MS44OSAxMDEuNTMgNTEuODcgMTAxLjA0IDUxLjg3IDEwMC4xNiA1MS44NyA5OS40NyA1MS45NiA5OC45OCA1Mi4xNCA5OC40OCA1Mi4zMyA5OC4xMSA1Mi42NiA5Ny44OSA1My4xMiA5Ny42NyA1My41NyA5Ny41NiA1NC4yMyA5Ny41NiA1NS4wOCA5Ny41NiA1NS45MyA5Ny42OCA1Ni42NiA5Ny45MSA1Ny4xMyA5OC4xNSA1Ny42MSA5OC41MiA1Ny45NCA5OS4wMSA1OC4xMiA5OS40OSA1OC4zIDEwMC4xNiA1OC4zOSAxMDAuOTkgNTguMzlMMTQ3LjI2IDU4LjM5IDE0Ny4yNiA1OC4wOEMxNDcuMyA1OC4xMyAxNDcuMzUgNTguMTggMTQ3LjQgNTguMjIgMTQ3LjU0IDU4LjMzIDE0Ny42OSA1OC4zOSAxNDcuODUgNTguMzlMMTUxLjgzIDU4LjM5IDE1MS44MyA0OS40OSAxNTAgNDkuNDkgMTUwIDU2LjcxWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjE1My42NiIgeT0iNDkuNDciIHdpZHRoPSIxLjgzIiBoZWlnaHQ9IjguOSIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjE2NC44OCIgeT0iNDkuMjUiIHdpZHRoPSIxLjQ1IiBoZWlnaHQ9IjEuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSIxNjIuOTgiIHk9IjQ5LjI1IiB3aWR0aD0iMS40NSIgaGVpZ2h0PSIxLjcyIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTE4MC4zNCA1MC43MSAxODMuMTUgNTAuMTYgMTgzLjIzIDUwLjE0IDE4My4wMiA0OS4yMiAxODEuNjIgNDkuNTlDMTgxLjQ2IDQ5LjQ3IDE4MS4zOCA0OS4zMSAxODEuMzggNDkuMTEgMTgxLjM4IDQ4Ljk2IDE4MS40MyA0OC44MyAxODEuNTQgNDguNzIgMTgxLjY1IDQ4LjYxIDE4MS43OCA0OC41NiAxODEuOTUgNDguNTYgMTgyLjA2IDQ4LjU2IDE4Mi4xNSA0OC41OCAxODIuMjMgNDguNjEgMTgyLjMxIDQ4LjY1IDE4Mi4zOCA0OC42OCAxODIuNDIgNDguNzJMMTgyLjUyIDQ4LjgxIDE4Mi43MiA0Ny44NyAxODIuNjcgNDcuODRDMTgyLjM0IDQ3LjYzIDE4MS45OSA0Ny41MyAxODEuNjUgNDcuNTMgMTgxLjI1IDQ3LjUzIDE4MC45MSA0Ny42NiAxODAuNjUgNDcuOTMgMTgwLjM5IDQ4LjE5IDE4MC4yNiA0OC41MSAxODAuMjYgNDguODcgMTgwLjI2IDQ5LjIzIDE4MC40IDQ5LjU3IDE4MC42NiA0OS44NEwxODAuMTUgNDkuOTcgMTgwLjMyIDUwLjcxWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjE4Ny4zOSIgeT0iNTkuMjIiIHdpZHRoPSIxLjQ1IiBoZWlnaHQ9IjEuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSIxODUuNSIgeT0iNTkuMjIiIHdpZHRoPSIxLjQ1IiBoZWlnaHQ9IjEuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMTYyLjg2IDU1LjA2QzE2Mi44NiA1NC42NCAxNjIuOTIgNTQuMzIgMTYzLjAzIDU0LjEgMTYzLjEzIDUzLjg5IDE2My4zMSA1My43NCAxNjMuNTQgNTMuNjYgMTYzLjc4IDUzLjU3IDE2NC4xMyA1My41MyAxNjQuNTggNTMuNTMgMTY1LjAzIDUzLjUzIDE2NS40MiA1My41NSAxNjUuODEgNTMuNThMMTY1LjgxIDU2LjY5IDE2NC41NCA1Ni42OUMxNjQuMTIgNTYuNjkgMTYzLjc4IDU2LjY1IDE2My41NSA1Ni41NiAxNjMuMzIgNTYuNDcgMTYzLjE1IDU2LjMyIDE2My4wNCA1Ni4xIDE2Mi45MyA1NS44NiAxNjIuODcgNTUuNTIgMTYyLjg3IDU1LjA3TTIwMC40MiA1Ni41MUMyMDAuNDIgNTYuMjQgMjAwLjUgNTYuMDEgMjAwLjY2IDU1LjgyIDIwMC44MiA1NS42MyAyMDEuMDEgNTUuNTQgMjAxLjI0IDU1LjU0IDIwMS40NyA1NS41NCAyMDEuNjcgNTUuNjMgMjAxLjgzIDU1LjgxIDIwMS45OSA1NS45OSAyMDIuMDcgNTYuMjIgMjAyLjA3IDU2LjQ5TDIwMi4wNyA1Ni42OCAyMDAuNDIgNTYuNjggMjAwLjQyIDU2LjVaTTIwOS4yNSA1Ni42OSAyMDYuNzYgNTYuNjkgMjA2Ljc2IDU1LjU4QzIwNi43NiA1NC42OCAyMDYuNTkgNTMuODcgMjA2LjI1IDUzLjE5IDIwNS45MSA1Mi41IDIwNS40MSA1MS45NiAyMDQuNzUgNTEuNTcgMjA0LjEgNTEuMTkgMjAzLjMgNTAuOTkgMjAyLjM4IDUwLjk5IDIwMS44NyA1MC45OSAyMDEuMzIgNTEuMDQgMjAwLjc2IDUxLjE0IDIwMC4xOCA1MS4yNCAxOTkuNTcgNTEuMzcgMTk4Ljk1IDUxLjUzTDE5OC44OCA1MS41NSAxOTkuMDIgNTIuOTUgMTk5LjAyIDUzLjA0QzE5OS4wMiA1My4wNCAxOTkuMTEgNTMuMDMgMTk5LjExIDUzLjAzIDE5OS44NCA1Mi45MSAyMDAuNCA1Mi44MyAyMDAuODQgNTIuNzYgMjAxLjI3IDUyLjcgMjAxLjY2IDUyLjY3IDIwMiA1Mi42NyAyMDIuNzYgNTIuNjcgMjAzLjQ0IDUyLjg4IDIwNC4wMyA1My4zMSAyMDQuNjIgNTMuNzIgMjA0LjkxIDU0LjQ5IDIwNC45MSA1NS41OUwyMDQuOTEgNTYuNyAyMDMuODkgNTYuNyAyMDMuODkgNTYuNTNDMjAzLjg5IDU2LjA4IDIwMy43OCA1NS42NSAyMDMuNTUgNTUuMjQgMjAzLjMyIDU0LjgzIDIwMy4wMSA1NC41IDIwMi42IDU0LjI0IDIwMi4yIDUzLjk5IDIwMS43NCA1My44NiAyMDEuMjMgNTMuODYgMjAwLjcyIDUzLjg2IDIwMC4yNiA1My45OSAxOTkuODUgNTQuMjQgMTk5LjQ0IDU0LjQ5IDE5OS4xMiA1NC44MyAxOTguODkgNTUuMjQgMTk4LjY2IDU1LjY1IDE5OC41NSA1Ni4wOSAxOTguNTUgNTYuNTRMMTk4LjU1IDU2LjcgMTg4LjA3IDU2LjcgMTg4LjA3IDUxLjk4IDE4Ni4yNCA1MS45OCAxODYuMjQgNTYuNyAxODIuNjYgNTYuNyAxODIuNjYgNTEuOTggMTgwLjgzIDUxLjk4IDE4MC44MyA1Ni43IDE2Ny42MSA1Ni43IDE2Ny42MSA1Mi4wMyAxNjcuNTQgNTIuMDNDMTY3LjI3IDUxLjk4IDE2Ni44IDUxLjk0IDE2Ni4xNiA1MS45MSAxNjUuNTMgNTEuODggMTY0Ljk3IDUxLjg2IDE2NC40OCA1MS44NiAxNjMuNiA1MS44NiAxNjIuOTEgNTEuOTUgMTYyLjQyIDUyLjEzIDE2MS45MiA1Mi4zMiAxNjEuNTUgNTIuNjUgMTYxLjMzIDUzLjExIDE2MS4xMSA1My41NiAxNjEgNTQuMjMgMTYxIDU1LjA3IDE2MSA1NS45MSAxNjEuMTIgNTYuNjUgMTYxLjM1IDU3LjEyIDE2MS41OSA1Ny42IDE2MS45NiA1Ny45MyAxNjIuNDUgNTguMTEgMTYyLjkzIDU4LjI5IDE2My42IDU4LjM4IDE2NC40MyA1OC4zOEwyMTEuMDYgNTguMzggMjExLjA2IDQ5LjQ4IDIwOS4yMyA0OS40OCAyMDkuMjMgNTYuN1oiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSIyMTIuOTIiIHk9IjQ5LjQ3IiB3aWR0aD0iMS44MyIgaGVpZ2h0PSI4LjkiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48Zz48cGF0aCBkPSJNMi43MiA3MC4yM0MzLjQ4IDcwLjIzIDQgNjkuOTMgNCA2OS4zTDQgNjguODVDNCA2OC4xOSAzLjQ5IDY3Ljg3IDIuNzIgNjcuODcgMi4yOCA2Ny44NyAxLjk0IDY3LjkgMS42MyA2Ny45MUwxLjYzIDcwLjE5QzEuOTQgNzAuMiAyLjI4IDcwLjIzIDIuNzIgNzAuMjNNMy45OSA3My44NiAyLjg5IDcxLjY2IDIuNiA3MS42NkMyLjIyIDcxLjY2IDEuOTEgNzEuNjYgMS42NCA3MS42NUwxLjY0IDczLjg2IDAgNzMuODYgMCA2Ni41MkMwLjc1IDY2LjQ1IDEuMzIgNjYuMzkgMi42IDY2LjM5IDQuNjMgNjYuMzkgNS42NyA2Ny4wNSA1LjY3IDY4LjU5TDUuNjcgNjkuNDRDNS42NyA3MC4zMyA1LjI0IDcwLjk2IDQuNDcgNzEuMzJMNS44NyA3My44NiAzLjk5IDczLjg2WiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMi4zMyA3MC41MyAxMi4zMyA2OS44N0MxMi4zMyA2OC40NSAxMS44IDY3Ljg3IDEwLjY4IDY3Ljg3IDkuNTYgNjcuODcgOS4wMiA2OC40NSA5LjAyIDY5Ljg3TDkuMDIgNzAuNTNDOS4wMiA3MS45NiA5LjU1IDcyLjUxIDEwLjY4IDcyLjUxIDExLjgxIDcyLjUxIDEyLjMzIDcxLjk2IDEyLjMzIDcwLjUzTTcuMzUgNzAuNyA3LjM1IDY5LjcxQzcuMzUgNjcuNDMgOC4zOCA2Ni40IDEwLjY3IDY2LjQgMTIuOTYgNjYuNCAxMy45OSA2Ny40MyAxMy45OSA2OS43MUwxMy45OSA3MC43QzEzLjk5IDczIDEyLjkxIDc0IDEwLjY3IDc0IDguNDMgNzQgNy4zNSA3My4wMSA3LjM1IDcwLjciIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48L2c+PHBhdGggZD0iTTIxLjkzIDY2LjUyIDE5LjE4IDcxLjAzIDE5LjE4IDczLjg2IDE3LjU1IDczLjg2IDE3LjU1IDcxLjAzIDE0Ljc4IDY2LjUyIDE2LjY5IDY2LjUyIDE4LjQgNjkuMzYgMjAuMTMgNjYuNTIgMjEuOTMgNjYuNTJaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTI2LjcgNzEuMjYgMjUuNzUgNjguNTkgMjQuOCA3MS4yNiAyNi43MSA3MS4yNlpNMjcuMjEgNzIuNyAyNC4yOSA3Mi43IDIzLjg4IDczLjg2IDIyLjEgNzMuODYgMjQuOTIgNjYuNTIgMjYuNTkgNjYuNTIgMjkuNDggNzMuODYgMjcuNjQgNzMuODYgMjcuMjIgNzIuN1oiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMzUuNDkgNzIuMzggMzUuNDkgNzMuODYgMzAuODMgNzMuODYgMzAuODMgNjYuNTIgMzIuNDYgNjYuNTIgMzIuNDYgNzIuMzggMzUuNDkgNzIuMzhaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PGc+PHBhdGggZD0iTTQwLjEgNzAuNyA0MC4xIDY5LjcxQzQwLjEgNjcuNDMgNDEuMTcgNjYuNCA0My40NCA2Ni40IDQ0LjUzIDY2LjQgNDUuMjggNjYuNjQgNDUuOTUgNjcuMTVMNDUuMSA2OC40NEM0NC42OSA2OC4wOSA0NC4xMSA2Ny44OSA0My40OCA2Ny44OSA0Mi4zNSA2Ny44OSA0MS43NyA2OC40MSA0MS43NyA2OS44OUw0MS43NyA3MC41NUM0MS43NyA3Mi4wMiA0Mi4zNCA3Mi41MyA0My40OCA3Mi41MyA0NC4xMSA3Mi41MyA0NC42OCA3Mi4zMiA0NS4xMSA3Mi4wM0w0NS45NyA3My4yN0M0NS4yOCA3My43NyA0NC41MyA3NC4wMiA0My40NCA3NC4wMiA0MS4xNyA3NC4wMiA0MC4xIDcyLjk5IDQwLjEgNzAuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNNTIuMDIgNzAuNTMgNTIuMDIgNjkuODdDNTIuMDIgNjguNDUgNTEuNDkgNjcuODcgNTAuMzYgNjcuODcgNDkuMjMgNjcuODcgNDguNzEgNjguNDUgNDguNzEgNjkuODdMNDguNzEgNzAuNTNDNDguNzEgNzEuOTYgNDkuMjQgNzIuNTEgNTAuMzYgNzIuNTEgNTEuNDggNzIuNTEgNTIuMDIgNzEuOTYgNTIuMDIgNzAuNTNNNDcuMDQgNzAuNyA0Ny4wNCA2OS43MUM0Ny4wNCA2Ny40MyA0OC4wNyA2Ni40IDUwLjM2IDY2LjQgNTIuNjUgNjYuNCA1My42OCA2Ny40MyA1My42OCA2OS43MUw1My42OCA3MC43QzUzLjY4IDczIDUyLjYgNzQgNTAuMzYgNzQgNDguMTIgNzQgNDcuMDQgNzMuMDEgNDcuMDQgNzAuNyIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjwvZz48cGF0aCBkPSJNNjMuMzEgNjYuNTIgNjMuMzEgNzMuODYgNjEuNjggNzMuODYgNjEuNzUgNjkuNDUgNjAuMTIgNzIuNTcgNTguODQgNzIuNTcgNTcuMjIgNjkuNDYgNTcuMjkgNzMuODYgNTUuNjYgNzMuODYgNTUuNjYgNjYuNTIgNTcuMzQgNjYuNTIgNTkuNDggNzAuNjggNjEuNjQgNjYuNTIgNjMuMzEgNjYuNTJaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTczLjM0IDY2LjUyIDczLjM0IDczLjg2IDcxLjcxIDczLjg2IDcxLjc5IDY5LjQ1IDcwLjE2IDcyLjU3IDY4Ljg4IDcyLjU3IDY3LjI2IDY5LjQ2IDY3LjMyIDczLjg2IDY1LjY5IDczLjg2IDY1LjY5IDY2LjUyIDY3LjM3IDY2LjUyIDY5LjUyIDcwLjY4IDcxLjY4IDY2LjUyIDczLjM0IDY2LjUyWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9Ijc1LjczIiB5PSI2Ni41MiIgd2lkdGg9IjEuNjMiIGhlaWdodD0iNy4zNCIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxnPjxwYXRoIGQ9Ik03OS4yMiA3My40MiA3OS41NyA3Mi4wMkM4MC4yMiA3Mi4zNCA4MS4xNiA3Mi41IDgxLjg4IDcyLjUgODIuNjcgNzIuNSA4My4xNiA3Mi4zNSA4My4xNiA3MS45MiA4My4xNiA3MS40MiA4Mi4xMyA3MS4wNCA4MS4zMiA3MC42OCA4MC4zNCA3MC4yNCA3OS41NCA2OS42NiA3OS41NCA2OC41NiA3OS41NCA2Ny4zMSA4MC40MyA2Ni40IDgyLjU1IDY2LjQgODMuNTQgNjYuNCA4NC4zNiA2Ni42MiA4NC45OCA2Ni45N0w4NC42NSA2OC4zM0M4NC4wNSA2OC4wMiA4My4yNiA2Ny44OCA4Mi41OCA2Ny44OCA4MS43OSA2Ny44OCA4MS4zMSA2OCA4MS4zMSA2OC40NiA4MS4zMSA2OC45NSA4Mi40MyA2OS4zIDgzLjIgNjkuNjMgODQuMTggNzAuMDYgODQuOTMgNzAuNjkgODQuOTMgNzEuNzkgODQuOTMgNzMuMTQgODQuMDQgNzMuOTkgODEuODEgNzMuOTkgODAuNzggNzMuOTkgNzkuOTMgNzMuOCA3OS4yMiA3My40MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik04Ni4zMSA3My40MiA4Ni42NiA3Mi4wMkM4Ny4zMSA3Mi4zNCA4OC4yNSA3Mi41IDg4Ljk3IDcyLjUgODkuNzYgNzIuNSA5MC4yNSA3Mi4zNSA5MC4yNSA3MS45MiA5MC4yNSA3MS40MiA4OS4yMiA3MS4wNCA4OC40MSA3MC42OCA4Ny40MyA3MC4yNCA4Ni42MyA2OS42NiA4Ni42MyA2OC41NiA4Ni42MyA2Ny4zMSA4Ny41MiA2Ni40IDg5LjY0IDY2LjQgOTAuNjMgNjYuNCA5MS40NSA2Ni42MiA5Mi4wNyA2Ni45N0w5MS43NCA2OC4zM0M5MS4xNCA2OC4wMiA5MC4zNSA2Ny44OCA4OS42NyA2Ny44OCA4OC44OCA2Ny44OCA4OC40IDY4IDg4LjQgNjguNDYgODguNCA2OC45NSA4OS41MiA2OS4zIDkwLjI5IDY5LjYzIDkxLjI3IDcwLjA2IDkyLjAyIDcwLjY5IDkyLjAyIDcxLjc5IDkyLjAyIDczLjE0IDkxLjEzIDczLjk5IDg4LjkgNzMuOTkgODcuODcgNzMuOTkgODcuMDIgNzMuOCA4Ni4zMSA3My40MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjwvZz48cmVjdCB4PSI5My45MiIgeT0iNjYuNTIiIHdpZHRoPSIxLjYzIiBoZWlnaHQ9IjcuMzQiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMTAyLjUgNzAuNTMgMTAyLjUgNjkuODdDMTAyLjUgNjguNDUgMTAxLjk3IDY3Ljg3IDEwMC44NCA2Ny44NyA5OS43MSA2Ny44NyA5OS4xOSA2OC40NSA5OS4xOSA2OS44N0w5OS4xOSA3MC41M0M5OS4xOSA3MS45NiA5OS43MiA3Mi41MSAxMDAuODQgNzIuNTEgMTAxLjk2IDcyLjUxIDEwMi41IDcxLjk2IDEwMi41IDcwLjUzTTk3LjUyIDcwLjcgOTcuNTIgNjkuNzFDOTcuNTIgNjcuNDMgOTguNTUgNjYuNCAxMDAuODQgNjYuNCAxMDMuMTMgNjYuNCAxMDQuMTYgNjcuNDMgMTA0LjE2IDY5LjcxTDEwNC4xNiA3MC43QzEwNC4xNiA3MyAxMDMuMDggNzQgMTAwLjg0IDc0IDk4LjYgNzQgOTcuNTIgNzMuMDEgOTcuNTIgNzAuNyIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMTIuNjYgNjYuNTIgMTEyLjY2IDczLjg2IDExMC44NSA3My44NiAxMDcuNjkgNjguOTcgMTA3Ljc3IDczLjg2IDEwNi4xNCA3My44NiAxMDYuMTQgNjYuNTIgMTA3Ljk2IDY2LjUyIDExMS4xNCA3MS40MiAxMTEuMDMgNjYuNTIgMTEyLjY2IDY2LjUyWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMjAuMDcgNjggMTIwLjA3IDY5LjU1IDEyMi44NSA2OS41NSAxMjIuODUgNzEuMDMgMTIwLjA3IDcxLjAzIDEyMC4wNyA3My44NiAxMTguNDQgNzMuODYgMTE4LjQ0IDY2LjUyIDEyMy4xIDY2LjUyIDEyMy4xIDY4IDEyMC4wNyA2OFoiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48Zz48cGF0aCBkPSJNMTI5LjY4IDcwLjUzIDEyOS42OCA2OS44N0MxMjkuNjggNjguNDUgMTI5LjE1IDY3Ljg3IDEyOC4wMiA2Ny44NyAxMjYuODkgNjcuODcgMTI2LjM2IDY4LjQ1IDEyNi4zNiA2OS44N0wxMjYuMzYgNzAuNTNDMTI2LjM2IDcxLjk2IDEyNi44OSA3Mi41MSAxMjguMDIgNzIuNTEgMTI5LjE1IDcyLjUxIDEyOS42OCA3MS45NiAxMjkuNjggNzAuNTNNMTI0LjcgNzAuNyAxMjQuNyA2OS43MUMxMjQuNyA2Ny40MyAxMjUuNzMgNjYuNCAxMjguMDIgNjYuNCAxMzAuMzEgNjYuNCAxMzEuMzQgNjcuNDMgMTMxLjM0IDY5LjcxTDEzMS4zNCA3MC43QzEzMS4zNCA3MyAxMzAuMjYgNzQgMTI4LjAyIDc0IDEyNS43OCA3NCAxMjQuNyA3My4wMSAxMjQuNyA3MC43IiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTEzNi4wNCA3MC4yM0MxMzYuODEgNzAuMjMgMTM3LjMyIDY5LjkzIDEzNy4zMiA2OS4zTDEzNy4zMiA2OC44NUMxMzcuMzIgNjguMTkgMTM2LjgxIDY3Ljg3IDEzNi4wNCA2Ny44NyAxMzUuNiA2Ny44NyAxMzUuMjYgNjcuOSAxMzQuOTUgNjcuOTFMMTM0Ljk1IDcwLjE5QzEzNS4yNiA3MC4yIDEzNS42IDcwLjIzIDEzNi4wNCA3MC4yM00xMzcuMzEgNzMuODYgMTM2LjIxIDcxLjY2IDEzNS45MiA3MS42NkMxMzUuNTQgNzEuNjYgMTM1LjIzIDcxLjY2IDEzNC45NSA3MS42NUwxMzQuOTUgNzMuODYgMTMzLjMyIDczLjg2IDEzMy4zMiA2Ni41MkMxMzQuMDcgNjYuNDUgMTM0LjY0IDY2LjM5IDEzNS45MSA2Ni4zOSAxMzcuOTQgNjYuMzkgMTM4Ljk4IDY3LjA1IDEzOC45OCA2OC41OUwxMzguOTggNjkuNDRDMTM4Ljk4IDcwLjMzIDEzOC41NSA3MC45NiAxMzcuNzggNzEuMzJMMTM5LjE4IDczLjg2IDEzNy4zIDczLjg2WiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xNDcuMTkgNzAuMjNDMTQ3Ljk2IDcwLjIzIDE0OC40NyA2OS45MyAxNDguNDcgNjkuM0wxNDguNDcgNjguODVDMTQ4LjQ3IDY4LjE5IDE0Ny45NiA2Ny44NyAxNDcuMTkgNjcuODcgMTQ2Ljc1IDY3Ljg3IDE0Ni40MSA2Ny45IDE0Ni4xIDY3LjkxTDE0Ni4xIDcwLjE5QzE0Ni40MSA3MC4yIDE0Ni43NSA3MC4yMyAxNDcuMTkgNzAuMjNNMTQ4LjQ2IDczLjg2IDE0Ny4zNiA3MS42NiAxNDcuMDcgNzEuNjZDMTQ2LjY5IDcxLjY2IDE0Ni4zOCA3MS42NiAxNDYuMSA3MS42NUwxNDYuMSA3My44NiAxNDQuNDcgNzMuODYgMTQ0LjQ3IDY2LjUyQzE0NS4yMiA2Ni40NSAxNDUuNzkgNjYuMzkgMTQ3LjA2IDY2LjM5IDE0OS4wOSA2Ni4zOSAxNTAuMTMgNjcuMDUgMTUwLjEzIDY4LjU5TDE1MC4xMyA2OS40NEMxNTAuMTMgNzAuMzMgMTQ5LjcgNzAuOTYgMTQ4LjkzIDcxLjMyTDE1MC4zMyA3My44NiAxNDguNDUgNzMuODZaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PC9nPjxyZWN0IHg9IjE1Mi4yNCIgeT0iNjYuNTIiIHdpZHRoPSIxLjYzIiBoZWlnaHQ9IjcuMzQiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMTYyLjIxIDY2LjUyIDE1OS40NiA3MS4wMyAxNTkuNDYgNzMuODYgMTU3LjgzIDczLjg2IDE1Ny44MyA3MS4wMyAxNTUuMDYgNjYuNTIgMTU2Ljk3IDY2LjUyIDE1OC42OSA2OS4zNiAxNjAuNDIgNjYuNTIgMTYyLjIxIDY2LjUyWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xNjYuOTggNzEuMjYgMTY2LjAzIDY4LjU5IDE2NS4wOCA3MS4yNiAxNjYuOTkgNzEuMjZaTTE2Ny40OSA3Mi43IDE2NC41NyA3Mi43IDE2NC4xNiA3My44NiAxNjIuMzggNzMuODYgMTY1LjIgNjYuNTIgMTY2Ljg3IDY2LjUyIDE2OS43NiA3My44NiAxNjcuOTIgNzMuODYgMTY3LjUxIDcyLjdaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTE3NS42NyA2OS44NUMxNzUuNjcgNjguNDYgMTc1LjE0IDY3Ljg4IDE3My44OSA2Ny44OCAxNzMuNDkgNjcuODggMTczLjA5IDY3LjkxIDE3Mi43NCA2Ny45M0wxNzIuNzQgNzIuNDZDMTczLjA5IDcyLjQ5IDE3My40OSA3Mi41MSAxNzMuODkgNzIuNTEgMTc1LjE0IDcyLjUxIDE3NS42NyA3MS45NiAxNzUuNjcgNzAuNTVMMTc1LjY3IDY5Ljg0Wk0xNzcuMzQgNjkuNyAxNzcuMzQgNzAuNjlDMTc3LjM0IDcyLjk5IDE3Ni4yNiA3My45OSAxNzMuNzcgNzMuOTkgMTcyLjU1IDczLjk5IDE3MS44NiA3My45MyAxNzEuMTEgNzMuODZMMTcxLjExIDY2LjUyQzE3MS44NiA2Ni40NSAxNzIuNTUgNjYuMzkgMTczLjc3IDY2LjM5IDE3Ni4zMiA2Ni4zOSAxNzcuMzQgNjcuNDIgMTc3LjM0IDY5LjciIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMTg1LjgxIDY2LjUyIDE4NS44MSA3My44NiAxODQuMTggNzMuODYgMTg0LjE4IDcwLjkyIDE4MC45NCA3MC45MiAxODAuOTQgNzMuODYgMTc5LjMxIDczLjg2IDE3OS4zMSA2Ni41MiAxODAuOTQgNjYuNTIgMTgwLjk0IDY5LjQzIDE4NC4xOCA2OS40MyAxODQuMTggNjYuNTIgMTg1LjgxIDY2LjUyWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xOTEuMTcgNzAuNyAxOTEuMTcgNjkuNzFDMTkxLjE3IDY3LjQzIDE5Mi4yNCA2Ni40IDE5NC41MSA2Ni40IDE5NS42IDY2LjQgMTk2LjM1IDY2LjY0IDE5Ny4wMiA2Ny4xNUwxOTYuMTcgNjguNDRDMTk1Ljc2IDY4LjA5IDE5NS4xOCA2Ny44OSAxOTQuNTUgNjcuODkgMTkzLjQyIDY3Ljg5IDE5Mi44NCA2OC40MSAxOTIuODQgNjkuODlMMTkyLjg0IDcwLjU1QzE5Mi44NCA3Mi4wMiAxOTMuNCA3Mi41MyAxOTQuNTUgNzIuNTMgMTk1LjE4IDcyLjUzIDE5NS43NSA3Mi4zMiAxOTYuMTggNzIuMDNMMTk3LjA0IDczLjI3QzE5Ni4zNSA3My43NyAxOTUuNiA3NC4wMiAxOTQuNTEgNzQuMDIgMTkyLjI0IDc0LjAyIDE5MS4xNyA3Mi45OSAxOTEuMTcgNzAuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSIxOTguNTIiIHk9IjY2LjUyIiB3aWR0aD0iMS42MyIgaGVpZ2h0PSI3LjM0IiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTIwNy40MiA2OCAyMDUuMjggNjggMjA1LjI4IDczLjg2IDIwMy42NSA3My44NiAyMDMuNjUgNjggMjAxLjUyIDY4IDIwMS41MSA2Ni41MiAyMDcuNDIgNjYuNTIgMjA3LjQyIDY4WiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0yMTQuNzMgNjYuNTIgMjExLjk4IDcxLjAzIDIxMS45OCA3My44NiAyMTAuMzUgNzMuODYgMjEwLjM1IDcxLjAzIDIwNy41OCA2Ni41MiAyMDkuNDkgNjYuNTIgMjExLjIxIDY5LjM2IDIxMi45NCA2Ni41MiAyMTQuNzMgNjYuNTJaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PGc+PHBhdGggZD0iTTEwNi4yMSAzMS4xNkMxMDYuMjEgMzEuMTYgMTA3LjY5IDMyLjI4IDEwOC42OSAzMi45OCAxMDkuMDMgMzMuMjMgMTA4LjMyIDMzLjMyIDEwNy41MiAzMy44MiAxMDYuODYgMzQuMjEgMTA3LjU4IDM0Ljg5IDEwOC4yIDM0Ljg2IDEwOC44MyAzNC44MyAxMDkuMTcgMzQuMSAxMDkuNjggMzQuMDcgMTEwLjE2IDM0LjA0IDExMS43IDM1LjM2IDExMi45MyAzNi4xNSAxMTQuMTkgMzYuOTQgMTE0LjY0IDM3LjEgMTE1LjM1IDM2LjQgMTE3LjY5IDM0LjA0IDExNS42MyAzNS4wOCAxMTUuMDYgMzUuMjJMMTExLjI3IDMyLjg5QzExMS4wMSAzMi43MiAxMTEuNDEgMzIuNDQgMTExLjc1IDMyLjEgMTEyLjE4IDMxLjcxIDExMi40OSAzMS4yOSAxMTEuNjkgMzAuODcgMTEwLjg5IDMwLjQ4IDExMC42MSAzMS4yOSAxMTAuMzUgMzEuNzEgMTEwLjEyIDMyLjEzIDEwOS43OCAzMi4wMiAxMDkuNTggMzEuODhMMTA3LjQ0IDMwLjM3QzExOC45IDIyLjM3IDEyOC42NSAyMy43NSAxMjguNjUgMjMuNzUgMTI4LjY1IDIzLjc1IDEyNS4zNyAyMi4yNiAxMTguOSAyMy42NCAxMTIuNDMgMjUuMDEgMTA2LjE2IDI5LjUgMTA2LjE2IDI5LjUgMTA2LjIyIDI5LjUgOTkuOTUgMjUuMDEgOTMuNDcgMjMuNjQgODcgMjIuMjYgODMuNzIgMjMuNzUgODMuNzIgMjMuNzUgODMuNzIgMjMuNzUgOTMuNDcgMjIuMzcgMTA0LjkzIDMwLjM3TDEwMi43OSAzMS44OEMxMDIuNTkgMzIuMDIgMTAyLjI1IDMyLjEzIDEwMi4wMiAzMS43MSAxMDEuNzYgMzEuMjkgMTAxLjQ4IDMwLjQ4IDEwMC42OCAzMC44NyA5OS44OCAzMS4yOSAxMDAuMiAzMS43MSAxMDAuNjIgMzIuMSAxMDAuOTYgMzIuNDQgMTAxLjM2IDMyLjcyIDEwMS4xIDMyLjg5TDk3LjMxIDM1LjIyQzk2Ljc0IDM1LjA4IDk0LjY5IDM0LjA0IDk3LjAzIDM2LjQgOTcuNzQgMzcuMSA5OC4yIDM2LjkzIDk5LjQ1IDM2LjE1IDEwMC42OCAzNS4zNiAxMDIuMjIgMzQuMDUgMTAyLjcgMzQuMDcgMTAzLjIxIDM0LjEgMTAzLjU1IDM0LjgzIDEwNC4xOCAzNC44NiAxMDQuODEgMzQuODkgMTA1LjUyIDM0LjIxIDEwNC44NiAzMy44MiAxMDQuMDYgMzMuMzEgMTAzLjM1IDMzLjIzIDEwMy42OSAzMi45OCAxMDQuNjkgMzIuMjggMTA2LjE3IDMxLjE2IDEwNi4xNyAzMS4xNiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMTMuNTEgMTAuNjRDMTEzLjA4IDguMzEgMTExLjIgNy40NyAxMDkuNzIgNy40NCAxMTAuODYgNi40IDExMy4xNCA2LjU3IDExNC41NCA3LjY2IDExMy41NyA1LjE5IDExMS4wMSA0LjE1IDEwOC41IDUuMzMgMTA4LjkgNC4xMiAxMTEuMzUgMi45MiAxMTMuMTcgMy42OCAxMTEuNjMgMi4zMyAxMDkuMjQgMS44IDEwNy4xMyAzLjM3IDEwNy4wNyAyLjEzIDEwNi44NSAxLjA3IDEwNi4xOS0wLjAxIDEwNi4xOS0wLjAxIDEwNi4xOS0wLjAxIDEwNi4xOS0wLjAxIDEwNS41MyAxLjA2IDEwNS4zMSAyLjEyIDEwNS4yNiAzLjM2IDEwMy4xNSAxLjc5IDEwMC43NiAyLjMyIDk5LjIxIDMuNjcgMTAxLjA0IDIuOTEgMTAzLjQ5IDQuMTIgMTAzLjg5IDUuMzIgMTAxLjM4IDQuMTQgOTguODEgNS4xOCA5Ny44NSA3LjY1IDk5LjI1IDYuNTYgMTAxLjUzIDYuMzkgMTAyLjY3IDcuNDMgMTAxLjE5IDcuNDYgOTkuMzEgOC4zIDk4Ljg4IDEwLjYzIDEwMC4wOCA5LjU2IDEwMS43OSA5LjE3IDEwMy41OCA5LjU0IDEwMy4xNSA5LjYyIDEwMi43IDkuNzQgMTAyLjI0IDkuOTYgMTAwLjU5IDEwLjg2IDEwMC4zNiAxMi42OCAxMDAuMzYgMTIuNjggMTAwLjM2IDEyLjY4IDEwMS45IDExLjMzIDEwNC4yNyAxMS40MiAxMDQuNTYgMTEuNDIgMTA0LjgxIDExLjQyIDEwNS4wNCAxMS40OEwxMDUuMSAxMS42NSAxMDUuMSAyNS4yN0MxMDMuOTkgMjUuMzggMTAyLjk5IDI1LjY5IDEwMi4zOSAyNi4yMyAxMDIuMzkgMjYuMjMgMTA1LjUgMjcuODMgMTA2LjIxIDI4LjQyIDEwNi45MiAyNy44MyAxMTAuMDMgMjYuMjMgMTEwLjAzIDI2LjIzIDEwOS40MyAyNS43IDEwOC40MyAyNS4zOSAxMDcuMzIgMjUuMjdMMTA3LjMyIDExLjY1IDEwNy4zOCAxMS40OEMxMDcuNjEgMTEuNDIgMTA3Ljg2IDExLjQyIDEwOC4xNSAxMS40MiAxMTAuNTIgMTEuMzQgMTEyLjA2IDEyLjY4IDExMi4wNiAxMi42OCAxMTIuMDYgMTIuNjggMTExLjgzIDEwLjg2IDExMC4xOCA5Ljk2IDEwOS43MiA5Ljc0IDEwOS4yNyA5LjYyIDEwOC44NCA5LjU0IDExMC42NCA5LjE3IDExMi4zNSA5LjU3IDExMy41NSAxMC42MyIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjwvZz48L2c+PC9nPjwvc3ZnPg==" alt="RCRC">
+  <div class="pw-title">متابعة الاجتماع الأسبوعي</div>
+  <div class="pw-sub">الإدارة العامة للإعلام والتواصل</div>
+  <input class="pw-input" id="pwInput" type="password" placeholder="أدخل كلمة المرور" 
+    onkeydown="if(event.key==='Enter')checkPassword()">
+  <button class="pw-btn" onclick="checkPassword()">دخول</button>
+  <div class="pw-error" id="pwError"></div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="load-text">جاري تحميل البيانات...</div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" style="background:linear-gradient(135deg,#0a3520 0%,#0d4a2f 60%,#1a6b45 100%)">
+  <div class="nav-brand" style="display:flex;align-items:center;gap:14px">
+    <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjE0Ljc1IDczLjk5IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBpZD0iTGF5ZXJfMiIgb3ZlcmZsb3c9ImhpZGRlbiI+PHN0eWxlPg0KLk1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiB7DQogZmlsbDojRkZGRkZGOyANCn0NCjwvc3R5bGU+DQo8ZGVmcz48L2RlZnM+PGcgaWQ9IkxheWVyXzEtMiI+PGc+PHJlY3QgeD0iOS4wMiIgeT0iNDkuMTkiIHdpZHRoPSIxLjciIGhlaWdodD0iMS43OCIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMS44OSA1NS40OSAxMS44OSA1Ni43IDcuMzQgNTYuNyA3LjM0IDU2LjIyQzcuNjkgNTUuNTIgOC4xNSA1NC44OCA4LjcgNTQuMzQgOS4yNCA1My44IDkuODEgNTMuNTMgMTAuMzggNTMuNTMgMTAuODYgNTMuNTMgMTEuMjMgNTMuNzEgMTEuNDkgNTQuMDkgMTEuNzYgNTQuNDcgMTEuODkgNTQuOTQgMTEuODkgNTUuNDlNMTAuNzYgNTEuODVDMTAuMjEgNTEuODUgOS43MyA1MS45NSA5LjMxIDUyLjEzIDguOSA1Mi4zMSA4LjUzIDUyLjU2IDguMjIgNTIuODYgNy45NSA1My4xMiA3LjY2IDUzLjQzIDcuMzQgNTMuODNMNy4zNCA1MS45OCA1LjUxIDUxLjk4IDUuNTEgNTguMzNDNS41MSA1OC41OCA1LjQ0IDU4LjgyIDUuMyA1OS4wNCA1LjE2IDU5LjI2IDQuOTQgNTkuNDUgNC42NyA1OS41OCA0LjM5IDU5LjcyIDQuMDUgNTkuNzkgMy42NiA1OS43OSAzLjIzIDU5Ljc5IDIuODcgNTkuNzEgMi41OSA1OS41NSAyLjMyIDU5LjM5IDIuMTIgNTkuMTggMiA1OC45NCAxLjg4IDU4LjcgMS44MiA1OC40NiAxLjgyIDU4LjIyIDEuODIgNTcuODYgMiA1Ni43NSAyLjM0IDU0LjkxTDIuMzYgNTQuODIgMC42NyA1NC43MyAwLjYgNTQuNzNDMC42IDU0LjczIDAuNTkgNTQuNzkgMC41OSA1NC43OSAwLjQ0IDU1LjUxIDAuMzEgNTYuMjMgMC4yMSA1Ni45NCAwLjEgNTcuNjkgMC4wNCA1OC4yMSAwLjA0IDU4LjUzIDAuMDQgNTguOTUgMC4xNCA1OS4zOCAwLjM1IDU5LjgyIDAuNTYgNjAuMjcgMC45MyA2MC42NiAxLjQ3IDYwLjk4IDIuMDEgNjEuMyAyLjc1IDYxLjQ2IDMuNjcgNjEuNDYgNC41IDYxLjQ2IDUuMTkgNjEuMzMgNS43MyA2MS4wNiA2LjI4IDYwLjc5IDYuNjkgNjAuNDUgNi45NSA2MC4wNSA3LjIxIDU5LjY0IDcuMzQgNTkuMjIgNy4zNCA1OC43OUw3LjM0IDU4LjM3IDEzLjcyIDU4LjM3IDEzLjcyIDU1LjE1QzEzLjcyIDU0LjI3IDEzLjUgNTMuNDkgMTMuMDUgNTIuODQgMTIuNiA1Mi4xOCAxMS44MyA1MS44NCAxMC43NSA1MS44NCIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjE5LjM0IiB5PSI1OS4yMiIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjIxLjIzIiB5PSI1OS4yMiIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0yMS45IDUxLjk3IDIwLjA3IDUxLjk3IDIwLjA3IDU2LjY5IDE3LjE1IDU2LjY5IDE3LjE1IDQ5LjQ3IDE1LjMxIDQ5LjQ3IDE1LjMxIDU4LjM4IDIxLjkgNTguMzggMjEuOSA1MS45N1oiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMzIuNzggNTYuNjkgMjcuMDMgNTYuNjkgMjcuMDMgNTEuOTcgMjUuMiA1MS45NyAyNS4yIDU4LjUxQzI1LjIgNTguOTMgMjUuMTMgNTkuMjUgMjQuOTkgNTkuNDcgMjQuODYgNTkuNjggMjQuNjYgNTkuNzkgMjQuMzkgNTkuNzlMMjMuODggNTkuNzYgMjMuODggNjEuNDIgMjMuOTUgNjEuNDJDMjQuNDQgNjEuNDYgMjQuNzUgNjEuNDcgMjQuODcgNjEuNDcgMjUuNTkgNjEuNDcgMjYuMTMgNjEuMTkgMjYuNDkgNjAuNjIgMjYuODMgNjAuMDggMjcuMDIgNTkuMzMgMjcuMDMgNTguMzdMMzQuNjEgNTguMzcgMzQuNjEgNDkuNDcgMzIuNzggNDkuNDcgMzIuNzggNTYuNjlaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHJlY3QgeD0iMzYuNDUiIHk9IjQ5LjQ3IiB3aWR0aD0iMS44MyIgaGVpZ2h0PSI4LjkiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSI0NS43NyIgeT0iNDkuMjUiIHdpZHRoPSIxLjQ1IiBoZWlnaHQ9IjEuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSI0Ny42NyIgeT0iNDkuMjUiIHdpZHRoPSIxLjQ1IiBoZWlnaHQ9IjEuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSI1Ny41IiB5PSI0OS4xOSIgd2lkdGg9IjEuNyIgaGVpZ2h0PSIxLjc4IiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHJlY3QgeD0iNjIuMTIiIHk9IjU5LjIyIiB3aWR0aD0iMS40NCIgaGVpZ2h0PSIxLjcyIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHJlY3QgeD0iNjQuMDIiIHk9IjU5LjIyIiB3aWR0aD0iMS40NSIgaGVpZ2h0PSIxLjcyIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PGc+PHBhdGggZD0iTTQ1LjgxIDU0LjFDNDUuOTIgNTMuODkgNDYuMDkgNTMuNzQgNDYuMzIgNTMuNjYgNDYuNTYgNTMuNTcgNDYuOTEgNTMuNTMgNDcuMzYgNTMuNTMgNDcuODEgNTMuNTMgNDguMiA1My41NSA0OC41OSA1My41OUw0OC41OSA1Ni43IDQ3LjMyIDU2LjdDNDYuOSA1Ni43IDQ2LjU2IDU2LjY2IDQ2LjMyIDU2LjU3IDQ2LjA5IDU2LjQ4IDQ1LjkyIDU2LjMzIDQ1LjgxIDU2LjExIDQ1LjY5IDU1Ljg3IDQ1LjY0IDU1LjUzIDQ1LjY0IDU1LjA4IDQ1LjY0IDU0LjY2IDQ1LjcgNTQuMzQgNDUuODEgNTQuMTJNNjQuNjkgNTEuOTcgNjIuODYgNTEuOTcgNjIuODYgNTYuNjkgNTkuMjkgNTYuNjkgNTkuMjkgNTEuOTcgNTcuNDYgNTEuOTcgNTcuNDYgNTYuNjkgNTAuNDMgNTYuNjkgNTAuNDMgNTIuMDIgNTAuMzYgNTIuMDJDNTAuMDkgNTEuOTcgNDkuNjIgNTEuOTMgNDguOTggNTEuOSA0OC4zNSA1MS44NyA0Ny43OSA1MS44NSA0Ny4zIDUxLjg1IDQ2LjQyIDUxLjg1IDQ1LjczIDUxLjk0IDQ1LjI0IDUyLjEyIDQ0Ljc0IDUyLjMxIDQ0LjM3IDUyLjY0IDQ0LjE1IDUzLjEgNDMuOTMgNTMuNTUgNDMuODIgNTQuMjEgNDMuODIgNTUuMDYgNDMuODIgNTUuOTEgNDMuOTQgNTYuNjQgNDQuMTcgNTcuMTEgNDQuNDEgNTcuNTkgNDQuNzggNTcuOTIgNDUuMjcgNTguMSA0NS43NSA1OC4yOCA0Ni40MiA1OC4zNyA0Ny4yNSA1OC4zN0w2NC43MSA1OC4zNyA2NC43MSA1MS45N1oiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNODUuNjEgNTUuMTQgODUuNjEgNTYuNyA4My4xNCA1Ni43QzgzLjExIDU2LjUzIDgzLjA3IDU2LjMyIDgzLjA0IDU2LjA1IDgzIDU1Ljc2IDgyLjk4IDU1LjQ3IDgyLjk4IDU1LjE5IDgyLjk4IDU0LjczIDgzLjAzIDU0LjIgODMuMTQgNTMuNjEgODMuNDMgNTMuNTUgODMuNzMgNTMuNTIgODQuMDIgNTMuNTIgODQuNjQgNTMuNTIgODUuMDYgNTMuNjUgODUuMjggNTMuOTEgODUuNDkgNTQuMTcgODUuNiA1NC41OCA4NS42IDU1LjE0TTkwLjE5IDU2LjY5IDg4LjA1IDU2LjY5Qzg3LjkyIDU2LjY5IDg3LjgxIDU2LjY1IDg3LjcgNTYuNTYgODcuNTkgNTYuNDggODcuNTEgNTYuMzcgODcuNDYgNTYuMjJMODcuNDYgNTUuMTdDODcuNDYgNTQuNDIgODcuMzggNTMuODEgODcuMjEgNTMuMzUgODcuMDQgNTIuODcgODYuNzEgNTIuNSA4Ni4yNCA1Mi4yNCA4NS43NyA1MS45OSA4NS4wOSA1MS44NiA4NC4yMiA1MS44NiA4My42NyA1MS44NiA4My4xNyA1MS45IDgyLjczIDUxLjk5IDgyLjI4IDUyLjA3IDgxLjk0IDUyLjE3IDgxLjcxIDUyLjI4TDgxLjY4IDUyLjMgODEuNjggNTIuMzNDODEuNTUgNTIuNzIgODEuNDQgNTMuMTggODEuMzYgNTMuNyA4MS4yNyA1NC4yMyA4MS4yMiA1NC43MyA4MS4yMiA1NS4xOSA4MS4yMiA1NS42NSA4MS4yNyA1Ni4xNCA4MS4zOCA1Ni43TDcxLjc3IDU2LjcgNzEuNzcgNTYuMTdDNzEuNzcgNTUuMjEgNzEuNjMgNTQuMzggNzEuMzUgNTMuNzEgNzEuMDcgNTMuMDQgNzAuNjYgNTIuNTMgNzAuMTUgNTIuMiA2OS42NCA1MS44NiA2OS4wMyA1MS42OSA2OC4zNSA1MS42OSA2OC4wNyA1MS42OSA2Ny43NyA1MS43MSA2Ny40MyA1MS43NiA2Ny4wOSA1MS44MSA2Ni44IDUxLjg2IDY2LjU1IDUxLjkyTDY2LjQ4IDUxLjk0IDY2LjYxIDUzLjMyIDY2LjYxIDUzLjM5IDY3Ljk1IDUzLjM5QzY4LjQ5IDUzLjM5IDY4Ljk2IDUzLjYyIDY5LjM1IDU0LjA2IDY5Ljc0IDU0LjUgNjkuOTQgNTUuMjcgNjkuOTQgNTYuMzJMNjkuOTQgNTYuNjkgNjUuOTMgNTYuNjkgNjUuOTMgNTguMzcgODcuNDcgNTguMzcgODcuNDcgNTguMDZDODcuNTEgNTguMTEgODcuNTYgNTguMTYgODcuNjIgNTguMjEgODcuNzYgNTguMzIgODcuOTEgNTguMzggODguMDcgNTguMzhMOTIuMDUgNTguMzggOTIuMDUgNDkuNDggOTAuMjIgNDkuNDggOTAuMjIgNTYuN1oiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48L2c+PHJlY3QgeD0iMTAxLjQxIiB5PSI0OS4yNSIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9Ijk5LjUyIiB5PSI0OS4yNSIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjEwNi40IiB5PSI1OS4yMiIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjEwOC4zIiB5PSI1OS4yMiIgd2lkdGg9IjEuNDUiIGhlaWdodD0iMS43MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMDIuMzQgNTMuNTkgMTAyLjM0IDU2LjcgMTAxLjA3IDU2LjdDMTAwLjY1IDU2LjcgMTAwLjMxIDU2LjY2IDEwMC4wNyA1Ni41NyA5OS44NCA1Ni40OCA5OS42NyA1Ni4zMyA5OS41NiA1Ni4xIDk5LjQ0IDU1Ljg3IDk5LjM5IDU1LjUyIDk5LjM5IDU1LjA3IDk5LjM5IDU0LjY1IDk5LjQ1IDU0LjMzIDk5LjU2IDU0LjExIDk5LjY2IDUzLjkgOTkuODQgNTMuNzUgMTAwLjA3IDUzLjY3IDEwMC4zMSA1My41OCAxMDAuNjYgNTMuNTQgMTAxLjExIDUzLjU0IDEwMS41NiA1My41NCAxMDEuOTUgNTMuNTYgMTAyLjM0IDUzLjU5TTE0NS40MiA1NS4xNCAxNDUuNDIgNTYuNyAxNDIuOTUgNTYuN0MxNDIuOTEgNTYuNTMgMTQyLjg4IDU2LjMyIDE0Mi44NSA1Ni4wNSAxNDIuODEgNTUuNzYgMTQyLjc5IDU1LjQ3IDE0Mi43OSA1NS4xOSAxNDIuNzkgNTQuNzMgMTQyLjg0IDU0LjIgMTQyLjk1IDUzLjYxIDE0My4yNCA1My41NSAxNDMuNTQgNTMuNTIgMTQzLjgzIDUzLjUyIDE0NC40NSA1My41MiAxNDQuODcgNTMuNjUgMTQ1LjA5IDUzLjkxIDE0NS4zMSA1NC4xNyAxNDUuNDIgNTQuNTggMTQ1LjQyIDU1LjE0TTE0OS45OSA1Ni42OSAxNDcuODUgNTYuNjlDMTQ3LjczIDU2LjY5IDE0Ny42MSA1Ni42NSAxNDcuNSA1Ni41NiAxNDcuMzkgNTYuNDggMTQ3LjMxIDU2LjM2IDE0Ny4yNiA1Ni4yMkwxNDcuMjYgNTUuMTdDMTQ3LjI2IDU0LjQyIDE0Ny4xOCA1My44MSAxNDcuMDEgNTMuMzUgMTQ2Ljg0IDUyLjg3IDE0Ni41MSA1Mi41IDE0Ni4wMyA1Mi4yNCAxNDUuNTYgNTEuOTkgMTQ0Ljg4IDUxLjg2IDE0NC4wMSA1MS44NiAxNDMuNDYgNTEuODYgMTQyLjk2IDUxLjkgMTQyLjUyIDUxLjk5IDE0Mi4wNyA1Mi4wNyAxNDEuNzMgNTIuMTcgMTQxLjUgNTIuMjhMMTQxLjQ3IDUyLjMgMTQxLjQ3IDUyLjMzQzE0MS4zNCA1Mi43MSAxNDEuMjQgNTMuMTYgMTQxLjE1IDUzLjcgMTQxLjA2IDU0LjIzIDE0MS4wMSA1NC43MyAxNDEuMDEgNTUuMTkgMTQxLjAxIDU1LjY1IDE0MS4wNiA1Ni4xNCAxNDEuMTcgNTYuN0wxMjguNTIgNTYuNyAxMjguNTIgNDkuNDggMTI2LjY5IDQ5LjQ4IDEyNi42OSA1Ni43IDEyMy42NSA1Ni43IDEyMy42NSA1NS4yNUMxMjMuNjUgNTQuODYgMTIzLjU5IDU0LjQzIDEyMy40NyA1My45NyAxMjMuMzUgNTMuNTEgMTIzLjEgNTMuMDkgMTIyLjczIDUyLjcyIDEyMi4zNiA1Mi4zNSAxMjEuODIgNTIuMTYgMTIxLjEzIDUyLjE2TDExOC43OSA1Mi4xNiAxMTguOTUgNTEuODRDMTE5LjMzIDUxLjEyIDExOS43NCA1MC40NSAxMjAuMTcgNDkuODRMMTIwLjIyIDQ5Ljc3IDExOC44NSA0OSAxMTguODEgNDkuMDVDMTE4LjU2IDQ5LjMzIDExOC4yOCA0OS42NiAxMTguMDEgNTAuMDQgMTE3LjcyIDUwLjQzIDExNy41IDUwLjc4IDExNy4zMyA1MS4xMkwxMTYuNTggNTIuNTggMTE2LjU2IDUyLjYyIDExNy40NyA1My44NSAxMjAuODYgNTMuODVDMTIxLjEyIDUzLjg1IDEyMS4zNCA1My45NyAxMjEuNTIgNTQuMjMgMTIxLjcxIDU0LjQ5IDEyMS44MSA1NC44MyAxMjEuODEgNTUuMjVMMTIxLjgxIDU2LjcxIDEwOSA1Ni43MSAxMDkgNTEuOTkgMTA3LjE3IDUxLjk5IDEwNy4xNyA1Ni43MSAxMDQuMTcgNTYuNzEgMTA0LjE3IDUyLjA0IDEwNC4xIDUyLjA0QzEwMy44MyA1MS45OSAxMDMuMzYgNTEuOTUgMTAyLjcyIDUxLjkyIDEwMi4wOSA1MS44OSAxMDEuNTMgNTEuODcgMTAxLjA0IDUxLjg3IDEwMC4xNiA1MS44NyA5OS40NyA1MS45NiA5OC45OCA1Mi4xNCA5OC40OCA1Mi4zMyA5OC4xMSA1Mi42NiA5Ny44OSA1My4xMiA5Ny42NyA1My41NyA5Ny41NiA1NC4yMyA5Ny41NiA1NS4wOCA5Ny41NiA1NS45MyA5Ny42OCA1Ni42NiA5Ny45MSA1Ny4xMyA5OC4xNSA1Ny42MSA5OC41MiA1Ny45NCA5OS4wMSA1OC4xMiA5OS40OSA1OC4zIDEwMC4xNiA1OC4zOSAxMDAuOTkgNTguMzlMMTQ3LjI2IDU4LjM5IDE0Ny4yNiA1OC4wOEMxNDcuMyA1OC4xMyAxNDcuMzUgNTguMTggMTQ3LjQgNTguMjIgMTQ3LjU0IDU4LjMzIDE0Ny42OSA1OC4zOSAxNDcuODUgNTguMzlMMTUxLjgzIDU4LjM5IDE1MS44MyA0OS40OSAxNTAgNDkuNDkgMTUwIDU2LjcxWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjE1My42NiIgeT0iNDkuNDciIHdpZHRoPSIxLjgzIiBoZWlnaHQ9IjguOSIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjE2NC44OCIgeT0iNDkuMjUiIHdpZHRoPSIxLjQ1IiBoZWlnaHQ9IjEuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSIxNjIuOTgiIHk9IjQ5LjI1IiB3aWR0aD0iMS40NSIgaGVpZ2h0PSIxLjcyIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTE4MC4zNCA1MC43MSAxODMuMTUgNTAuMTYgMTgzLjIzIDUwLjE0IDE4My4wMiA0OS4yMiAxODEuNjIgNDkuNTlDMTgxLjQ2IDQ5LjQ3IDE4MS4zOCA0OS4zMSAxODEuMzggNDkuMTEgMTgxLjM4IDQ4Ljk2IDE4MS40MyA0OC44MyAxODEuNTQgNDguNzIgMTgxLjY1IDQ4LjYxIDE4MS43OCA0OC41NiAxODEuOTUgNDguNTYgMTgyLjA2IDQ4LjU2IDE4Mi4xNSA0OC41OCAxODIuMjMgNDguNjEgMTgyLjMxIDQ4LjY1IDE4Mi4zOCA0OC42OCAxODIuNDIgNDguNzJMMTgyLjUyIDQ4LjgxIDE4Mi43MiA0Ny44NyAxODIuNjcgNDcuODRDMTgyLjM0IDQ3LjYzIDE4MS45OSA0Ny41MyAxODEuNjUgNDcuNTMgMTgxLjI1IDQ3LjUzIDE4MC45MSA0Ny42NiAxODAuNjUgNDcuOTMgMTgwLjM5IDQ4LjE5IDE4MC4yNiA0OC41MSAxODAuMjYgNDguODcgMTgwLjI2IDQ5LjIzIDE4MC40IDQ5LjU3IDE4MC42NiA0OS44NEwxODAuMTUgNDkuOTcgMTgwLjMyIDUwLjcxWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9IjE4Ny4zOSIgeT0iNTkuMjIiIHdpZHRoPSIxLjQ1IiBoZWlnaHQ9IjEuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSIxODUuNSIgeT0iNTkuMjIiIHdpZHRoPSIxLjQ1IiBoZWlnaHQ9IjEuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMTYyLjg2IDU1LjA2QzE2Mi44NiA1NC42NCAxNjIuOTIgNTQuMzIgMTYzLjAzIDU0LjEgMTYzLjEzIDUzLjg5IDE2My4zMSA1My43NCAxNjMuNTQgNTMuNjYgMTYzLjc4IDUzLjU3IDE2NC4xMyA1My41MyAxNjQuNTggNTMuNTMgMTY1LjAzIDUzLjUzIDE2NS40MiA1My41NSAxNjUuODEgNTMuNThMMTY1LjgxIDU2LjY5IDE2NC41NCA1Ni42OUMxNjQuMTIgNTYuNjkgMTYzLjc4IDU2LjY1IDE2My41NSA1Ni41NiAxNjMuMzIgNTYuNDcgMTYzLjE1IDU2LjMyIDE2My4wNCA1Ni4xIDE2Mi45MyA1NS44NiAxNjIuODcgNTUuNTIgMTYyLjg3IDU1LjA3TTIwMC40MiA1Ni41MUMyMDAuNDIgNTYuMjQgMjAwLjUgNTYuMDEgMjAwLjY2IDU1LjgyIDIwMC44MiA1NS42MyAyMDEuMDEgNTUuNTQgMjAxLjI0IDU1LjU0IDIwMS40NyA1NS41NCAyMDEuNjcgNTUuNjMgMjAxLjgzIDU1LjgxIDIwMS45OSA1NS45OSAyMDIuMDcgNTYuMjIgMjAyLjA3IDU2LjQ5TDIwMi4wNyA1Ni42OCAyMDAuNDIgNTYuNjggMjAwLjQyIDU2LjVaTTIwOS4yNSA1Ni42OSAyMDYuNzYgNTYuNjkgMjA2Ljc2IDU1LjU4QzIwNi43NiA1NC42OCAyMDYuNTkgNTMuODcgMjA2LjI1IDUzLjE5IDIwNS45MSA1Mi41IDIwNS40MSA1MS45NiAyMDQuNzUgNTEuNTcgMjA0LjEgNTEuMTkgMjAzLjMgNTAuOTkgMjAyLjM4IDUwLjk5IDIwMS44NyA1MC45OSAyMDEuMzIgNTEuMDQgMjAwLjc2IDUxLjE0IDIwMC4xOCA1MS4yNCAxOTkuNTcgNTEuMzcgMTk4Ljk1IDUxLjUzTDE5OC44OCA1MS41NSAxOTkuMDIgNTIuOTUgMTk5LjAyIDUzLjA0QzE5OS4wMiA1My4wNCAxOTkuMTEgNTMuMDMgMTk5LjExIDUzLjAzIDE5OS44NCA1Mi45MSAyMDAuNCA1Mi44MyAyMDAuODQgNTIuNzYgMjAxLjI3IDUyLjcgMjAxLjY2IDUyLjY3IDIwMiA1Mi42NyAyMDIuNzYgNTIuNjcgMjAzLjQ0IDUyLjg4IDIwNC4wMyA1My4zMSAyMDQuNjIgNTMuNzIgMjA0LjkxIDU0LjQ5IDIwNC45MSA1NS41OUwyMDQuOTEgNTYuNyAyMDMuODkgNTYuNyAyMDMuODkgNTYuNTNDMjAzLjg5IDU2LjA4IDIwMy43OCA1NS42NSAyMDMuNTUgNTUuMjQgMjAzLjMyIDU0LjgzIDIwMy4wMSA1NC41IDIwMi42IDU0LjI0IDIwMi4yIDUzLjk5IDIwMS43NCA1My44NiAyMDEuMjMgNTMuODYgMjAwLjcyIDUzLjg2IDIwMC4yNiA1My45OSAxOTkuODUgNTQuMjQgMTk5LjQ0IDU0LjQ5IDE5OS4xMiA1NC44MyAxOTguODkgNTUuMjQgMTk4LjY2IDU1LjY1IDE5OC41NSA1Ni4wOSAxOTguNTUgNTYuNTRMMTk4LjU1IDU2LjcgMTg4LjA3IDU2LjcgMTg4LjA3IDUxLjk4IDE4Ni4yNCA1MS45OCAxODYuMjQgNTYuNyAxODIuNjYgNTYuNyAxODIuNjYgNTEuOTggMTgwLjgzIDUxLjk4IDE4MC44MyA1Ni43IDE2Ny42MSA1Ni43IDE2Ny42MSA1Mi4wMyAxNjcuNTQgNTIuMDNDMTY3LjI3IDUxLjk4IDE2Ni44IDUxLjk0IDE2Ni4xNiA1MS45MSAxNjUuNTMgNTEuODggMTY0Ljk3IDUxLjg2IDE2NC40OCA1MS44NiAxNjMuNiA1MS44NiAxNjIuOTEgNTEuOTUgMTYyLjQyIDUyLjEzIDE2MS45MiA1Mi4zMiAxNjEuNTUgNTIuNjUgMTYxLjMzIDUzLjExIDE2MS4xMSA1My41NiAxNjEgNTQuMjMgMTYxIDU1LjA3IDE2MSA1NS45MSAxNjEuMTIgNTYuNjUgMTYxLjM1IDU3LjEyIDE2MS41OSA1Ny42IDE2MS45NiA1Ny45MyAxNjIuNDUgNTguMTEgMTYyLjkzIDU4LjI5IDE2My42IDU4LjM4IDE2NC40MyA1OC4zOEwyMTEuMDYgNTguMzggMjExLjA2IDQ5LjQ4IDIwOS4yMyA0OS40OCAyMDkuMjMgNTYuN1oiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSIyMTIuOTIiIHk9IjQ5LjQ3IiB3aWR0aD0iMS44MyIgaGVpZ2h0PSI4LjkiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48Zz48cGF0aCBkPSJNMi43MiA3MC4yM0MzLjQ4IDcwLjIzIDQgNjkuOTMgNCA2OS4zTDQgNjguODVDNCA2OC4xOSAzLjQ5IDY3Ljg3IDIuNzIgNjcuODcgMi4yOCA2Ny44NyAxLjk0IDY3LjkgMS42MyA2Ny45MUwxLjYzIDcwLjE5QzEuOTQgNzAuMiAyLjI4IDcwLjIzIDIuNzIgNzAuMjNNMy45OSA3My44NiAyLjg5IDcxLjY2IDIuNiA3MS42NkMyLjIyIDcxLjY2IDEuOTEgNzEuNjYgMS42NCA3MS42NUwxLjY0IDczLjg2IDAgNzMuODYgMCA2Ni41MkMwLjc1IDY2LjQ1IDEuMzIgNjYuMzkgMi42IDY2LjM5IDQuNjMgNjYuMzkgNS42NyA2Ny4wNSA1LjY3IDY4LjU5TDUuNjcgNjkuNDRDNS42NyA3MC4zMyA1LjI0IDcwLjk2IDQuNDcgNzEuMzJMNS44NyA3My44NiAzLjk5IDczLjg2WiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMi4zMyA3MC41MyAxMi4zMyA2OS44N0MxMi4zMyA2OC40NSAxMS44IDY3Ljg3IDEwLjY4IDY3Ljg3IDkuNTYgNjcuODcgOS4wMiA2OC40NSA5LjAyIDY5Ljg3TDkuMDIgNzAuNTNDOS4wMiA3MS45NiA5LjU1IDcyLjUxIDEwLjY4IDcyLjUxIDExLjgxIDcyLjUxIDEyLjMzIDcxLjk2IDEyLjMzIDcwLjUzTTcuMzUgNzAuNyA3LjM1IDY5LjcxQzcuMzUgNjcuNDMgOC4zOCA2Ni40IDEwLjY3IDY2LjQgMTIuOTYgNjYuNCAxMy45OSA2Ny40MyAxMy45OSA2OS43MUwxMy45OSA3MC43QzEzLjk5IDczIDEyLjkxIDc0IDEwLjY3IDc0IDguNDMgNzQgNy4zNSA3My4wMSA3LjM1IDcwLjciIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48L2c+PHBhdGggZD0iTTIxLjkzIDY2LjUyIDE5LjE4IDcxLjAzIDE5LjE4IDczLjg2IDE3LjU1IDczLjg2IDE3LjU1IDcxLjAzIDE0Ljc4IDY2LjUyIDE2LjY5IDY2LjUyIDE4LjQgNjkuMzYgMjAuMTMgNjYuNTIgMjEuOTMgNjYuNTJaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTI2LjcgNzEuMjYgMjUuNzUgNjguNTkgMjQuOCA3MS4yNiAyNi43MSA3MS4yNlpNMjcuMjEgNzIuNyAyNC4yOSA3Mi43IDIzLjg4IDczLjg2IDIyLjEgNzMuODYgMjQuOTIgNjYuNTIgMjYuNTkgNjYuNTIgMjkuNDggNzMuODYgMjcuNjQgNzMuODYgMjcuMjIgNzIuN1oiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMzUuNDkgNzIuMzggMzUuNDkgNzMuODYgMzAuODMgNzMuODYgMzAuODMgNjYuNTIgMzIuNDYgNjYuNTIgMzIuNDYgNzIuMzggMzUuNDkgNzIuMzhaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PGc+PHBhdGggZD0iTTQwLjEgNzAuNyA0MC4xIDY5LjcxQzQwLjEgNjcuNDMgNDEuMTcgNjYuNCA0My40NCA2Ni40IDQ0LjUzIDY2LjQgNDUuMjggNjYuNjQgNDUuOTUgNjcuMTVMNDUuMSA2OC40NEM0NC42OSA2OC4wOSA0NC4xMSA2Ny44OSA0My40OCA2Ny44OSA0Mi4zNSA2Ny44OSA0MS43NyA2OC40MSA0MS43NyA2OS44OUw0MS43NyA3MC41NUM0MS43NyA3Mi4wMiA0Mi4zNCA3Mi41MyA0My40OCA3Mi41MyA0NC4xMSA3Mi41MyA0NC42OCA3Mi4zMiA0NS4xMSA3Mi4wM0w0NS45NyA3My4yN0M0NS4yOCA3My43NyA0NC41MyA3NC4wMiA0My40NCA3NC4wMiA0MS4xNyA3NC4wMiA0MC4xIDcyLjk5IDQwLjEgNzAuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNNTIuMDIgNzAuNTMgNTIuMDIgNjkuODdDNTIuMDIgNjguNDUgNTEuNDkgNjcuODcgNTAuMzYgNjcuODcgNDkuMjMgNjcuODcgNDguNzEgNjguNDUgNDguNzEgNjkuODdMNDguNzEgNzAuNTNDNDguNzEgNzEuOTYgNDkuMjQgNzIuNTEgNTAuMzYgNzIuNTEgNTEuNDggNzIuNTEgNTIuMDIgNzEuOTYgNTIuMDIgNzAuNTNNNDcuMDQgNzAuNyA0Ny4wNCA2OS43MUM0Ny4wNCA2Ny40MyA0OC4wNyA2Ni40IDUwLjM2IDY2LjQgNTIuNjUgNjYuNCA1My42OCA2Ny40MyA1My42OCA2OS43MUw1My42OCA3MC43QzUzLjY4IDczIDUyLjYgNzQgNTAuMzYgNzQgNDguMTIgNzQgNDcuMDQgNzMuMDEgNDcuMDQgNzAuNyIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjwvZz48cGF0aCBkPSJNNjMuMzEgNjYuNTIgNjMuMzEgNzMuODYgNjEuNjggNzMuODYgNjEuNzUgNjkuNDUgNjAuMTIgNzIuNTcgNTguODQgNzIuNTcgNTcuMjIgNjkuNDYgNTcuMjkgNzMuODYgNTUuNjYgNzMuODYgNTUuNjYgNjYuNTIgNTcuMzQgNjYuNTIgNTkuNDggNzAuNjggNjEuNjQgNjYuNTIgNjMuMzEgNjYuNTJaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTczLjM0IDY2LjUyIDczLjM0IDczLjg2IDcxLjcxIDczLjg2IDcxLjc5IDY5LjQ1IDcwLjE2IDcyLjU3IDY4Ljg4IDcyLjU3IDY3LjI2IDY5LjQ2IDY3LjMyIDczLjg2IDY1LjY5IDczLjg2IDY1LjY5IDY2LjUyIDY3LjM3IDY2LjUyIDY5LjUyIDcwLjY4IDcxLjY4IDY2LjUyIDczLjM0IDY2LjUyWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxyZWN0IHg9Ijc1LjczIiB5PSI2Ni41MiIgd2lkdGg9IjEuNjMiIGhlaWdodD0iNy4zNCIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxnPjxwYXRoIGQ9Ik03OS4yMiA3My40MiA3OS41NyA3Mi4wMkM4MC4yMiA3Mi4zNCA4MS4xNiA3Mi41IDgxLjg4IDcyLjUgODIuNjcgNzIuNSA4My4xNiA3Mi4zNSA4My4xNiA3MS45MiA4My4xNiA3MS40MiA4Mi4xMyA3MS4wNCA4MS4zMiA3MC42OCA4MC4zNCA3MC4yNCA3OS41NCA2OS42NiA3OS41NCA2OC41NiA3OS41NCA2Ny4zMSA4MC40MyA2Ni40IDgyLjU1IDY2LjQgODMuNTQgNjYuNCA4NC4zNiA2Ni42MiA4NC45OCA2Ni45N0w4NC42NSA2OC4zM0M4NC4wNSA2OC4wMiA4My4yNiA2Ny44OCA4Mi41OCA2Ny44OCA4MS43OSA2Ny44OCA4MS4zMSA2OCA4MS4zMSA2OC40NiA4MS4zMSA2OC45NSA4Mi40MyA2OS4zIDgzLjIgNjkuNjMgODQuMTggNzAuMDYgODQuOTMgNzAuNjkgODQuOTMgNzEuNzkgODQuOTMgNzMuMTQgODQuMDQgNzMuOTkgODEuODEgNzMuOTkgODAuNzggNzMuOTkgNzkuOTMgNzMuOCA3OS4yMiA3My40MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik04Ni4zMSA3My40MiA4Ni42NiA3Mi4wMkM4Ny4zMSA3Mi4zNCA4OC4yNSA3Mi41IDg4Ljk3IDcyLjUgODkuNzYgNzIuNSA5MC4yNSA3Mi4zNSA5MC4yNSA3MS45MiA5MC4yNSA3MS40MiA4OS4yMiA3MS4wNCA4OC40MSA3MC42OCA4Ny40MyA3MC4yNCA4Ni42MyA2OS42NiA4Ni42MyA2OC41NiA4Ni42MyA2Ny4zMSA4Ny41MiA2Ni40IDg5LjY0IDY2LjQgOTAuNjMgNjYuNCA5MS40NSA2Ni42MiA5Mi4wNyA2Ni45N0w5MS43NCA2OC4zM0M5MS4xNCA2OC4wMiA5MC4zNSA2Ny44OCA4OS42NyA2Ny44OCA4OC44OCA2Ny44OCA4OC40IDY4IDg4LjQgNjguNDYgODguNCA2OC45NSA4OS41MiA2OS4zIDkwLjI5IDY5LjYzIDkxLjI3IDcwLjA2IDkyLjAyIDcwLjY5IDkyLjAyIDcxLjc5IDkyLjAyIDczLjE0IDkxLjEzIDczLjk5IDg4LjkgNzMuOTkgODcuODcgNzMuOTkgODcuMDIgNzMuOCA4Ni4zMSA3My40MiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjwvZz48cmVjdCB4PSI5My45MiIgeT0iNjYuNTIiIHdpZHRoPSIxLjYzIiBoZWlnaHQ9IjcuMzQiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMTAyLjUgNzAuNTMgMTAyLjUgNjkuODdDMTAyLjUgNjguNDUgMTAxLjk3IDY3Ljg3IDEwMC44NCA2Ny44NyA5OS43MSA2Ny44NyA5OS4xOSA2OC40NSA5OS4xOSA2OS44N0w5OS4xOSA3MC41M0M5OS4xOSA3MS45NiA5OS43MiA3Mi41MSAxMDAuODQgNzIuNTEgMTAxLjk2IDcyLjUxIDEwMi41IDcxLjk2IDEwMi41IDcwLjUzTTk3LjUyIDcwLjcgOTcuNTIgNjkuNzFDOTcuNTIgNjcuNDMgOTguNTUgNjYuNCAxMDAuODQgNjYuNCAxMDMuMTMgNjYuNCAxMDQuMTYgNjcuNDMgMTA0LjE2IDY5LjcxTDEwNC4xNiA3MC43QzEwNC4xNiA3MyAxMDMuMDggNzQgMTAwLjg0IDc0IDk4LjYgNzQgOTcuNTIgNzMuMDEgOTcuNTIgNzAuNyIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMTIuNjYgNjYuNTIgMTEyLjY2IDczLjg2IDExMC44NSA3My44NiAxMDcuNjkgNjguOTcgMTA3Ljc3IDczLjg2IDEwNi4xNCA3My44NiAxMDYuMTQgNjYuNTIgMTA3Ljk2IDY2LjUyIDExMS4xNCA3MS40MiAxMTEuMDMgNjYuNTIgMTEyLjY2IDY2LjUyWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMjAuMDcgNjggMTIwLjA3IDY5LjU1IDEyMi44NSA2OS41NSAxMjIuODUgNzEuMDMgMTIwLjA3IDcxLjAzIDEyMC4wNyA3My44NiAxMTguNDQgNzMuODYgMTE4LjQ0IDY2LjUyIDEyMy4xIDY2LjUyIDEyMy4xIDY4IDEyMC4wNyA2OFoiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48Zz48cGF0aCBkPSJNMTI5LjY4IDcwLjUzIDEyOS42OCA2OS44N0MxMjkuNjggNjguNDUgMTI5LjE1IDY3Ljg3IDEyOC4wMiA2Ny44NyAxMjYuODkgNjcuODcgMTI2LjM2IDY4LjQ1IDEyNi4zNiA2OS44N0wxMjYuMzYgNzAuNTNDMTI2LjM2IDcxLjk2IDEyNi44OSA3Mi41MSAxMjguMDIgNzIuNTEgMTI5LjE1IDcyLjUxIDEyOS42OCA3MS45NiAxMjkuNjggNzAuNTNNMTI0LjcgNzAuNyAxMjQuNyA2OS43MUMxMjQuNyA2Ny40MyAxMjUuNzMgNjYuNCAxMjguMDIgNjYuNCAxMzAuMzEgNjYuNCAxMzEuMzQgNjcuNDMgMTMxLjM0IDY5LjcxTDEzMS4zNCA3MC43QzEzMS4zNCA3MyAxMzAuMjYgNzQgMTI4LjAyIDc0IDEyNS43OCA3NCAxMjQuNyA3My4wMSAxMjQuNyA3MC43IiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTEzNi4wNCA3MC4yM0MxMzYuODEgNzAuMjMgMTM3LjMyIDY5LjkzIDEzNy4zMiA2OS4zTDEzNy4zMiA2OC44NUMxMzcuMzIgNjguMTkgMTM2LjgxIDY3Ljg3IDEzNi4wNCA2Ny44NyAxMzUuNiA2Ny44NyAxMzUuMjYgNjcuOSAxMzQuOTUgNjcuOTFMMTM0Ljk1IDcwLjE5QzEzNS4yNiA3MC4yIDEzNS42IDcwLjIzIDEzNi4wNCA3MC4yM00xMzcuMzEgNzMuODYgMTM2LjIxIDcxLjY2IDEzNS45MiA3MS42NkMxMzUuNTQgNzEuNjYgMTM1LjIzIDcxLjY2IDEzNC45NSA3MS42NUwxMzQuOTUgNzMuODYgMTMzLjMyIDczLjg2IDEzMy4zMiA2Ni41MkMxMzQuMDcgNjYuNDUgMTM0LjY0IDY2LjM5IDEzNS45MSA2Ni4zOSAxMzcuOTQgNjYuMzkgMTM4Ljk4IDY3LjA1IDEzOC45OCA2OC41OUwxMzguOTggNjkuNDRDMTM4Ljk4IDcwLjMzIDEzOC41NSA3MC45NiAxMzcuNzggNzEuMzJMMTM5LjE4IDczLjg2IDEzNy4zIDczLjg2WiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xNDcuMTkgNzAuMjNDMTQ3Ljk2IDcwLjIzIDE0OC40NyA2OS45MyAxNDguNDcgNjkuM0wxNDguNDcgNjguODVDMTQ4LjQ3IDY4LjE5IDE0Ny45NiA2Ny44NyAxNDcuMTkgNjcuODcgMTQ2Ljc1IDY3Ljg3IDE0Ni40MSA2Ny45IDE0Ni4xIDY3LjkxTDE0Ni4xIDcwLjE5QzE0Ni40MSA3MC4yIDE0Ni43NSA3MC4yMyAxNDcuMTkgNzAuMjNNMTQ4LjQ2IDczLjg2IDE0Ny4zNiA3MS42NiAxNDcuMDcgNzEuNjZDMTQ2LjY5IDcxLjY2IDE0Ni4zOCA3MS42NiAxNDYuMSA3MS42NUwxNDYuMSA3My44NiAxNDQuNDcgNzMuODYgMTQ0LjQ3IDY2LjUyQzE0NS4yMiA2Ni40NSAxNDUuNzkgNjYuMzkgMTQ3LjA2IDY2LjM5IDE0OS4wOSA2Ni4zOSAxNTAuMTMgNjcuMDUgMTUwLjEzIDY4LjU5TDE1MC4xMyA2OS40NEMxNTAuMTMgNzAuMzMgMTQ5LjcgNzAuOTYgMTQ4LjkzIDcxLjMyTDE1MC4zMyA3My44NiAxNDguNDUgNzMuODZaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PC9nPjxyZWN0IHg9IjE1Mi4yNCIgeT0iNjYuNTIiIHdpZHRoPSIxLjYzIiBoZWlnaHQ9IjcuMzQiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMTYyLjIxIDY2LjUyIDE1OS40NiA3MS4wMyAxNTkuNDYgNzMuODYgMTU3LjgzIDczLjg2IDE1Ny44MyA3MS4wMyAxNTUuMDYgNjYuNTIgMTU2Ljk3IDY2LjUyIDE1OC42OSA2OS4zNiAxNjAuNDIgNjYuNTIgMTYyLjIxIDY2LjUyWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xNjYuOTggNzEuMjYgMTY2LjAzIDY4LjU5IDE2NS4wOCA3MS4yNiAxNjYuOTkgNzEuMjZaTTE2Ny40OSA3Mi43IDE2NC41NyA3Mi43IDE2NC4xNiA3My44NiAxNjIuMzggNzMuODYgMTY1LjIgNjYuNTIgMTY2Ljg3IDY2LjUyIDE2OS43NiA3My44NiAxNjcuOTIgNzMuODYgMTY3LjUxIDcyLjdaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTE3NS42NyA2OS44NUMxNzUuNjcgNjguNDYgMTc1LjE0IDY3Ljg4IDE3My44OSA2Ny44OCAxNzMuNDkgNjcuODggMTczLjA5IDY3LjkxIDE3Mi43NCA2Ny45M0wxNzIuNzQgNzIuNDZDMTczLjA5IDcyLjQ5IDE3My40OSA3Mi41MSAxNzMuODkgNzIuNTEgMTc1LjE0IDcyLjUxIDE3NS42NyA3MS45NiAxNzUuNjcgNzAuNTVMMTc1LjY3IDY5Ljg0Wk0xNzcuMzQgNjkuNyAxNzcuMzQgNzAuNjlDMTc3LjM0IDcyLjk5IDE3Ni4yNiA3My45OSAxNzMuNzcgNzMuOTkgMTcyLjU1IDczLjk5IDE3MS44NiA3My45MyAxNzEuMTEgNzMuODZMMTcxLjExIDY2LjUyQzE3MS44NiA2Ni40NSAxNzIuNTUgNjYuMzkgMTczLjc3IDY2LjM5IDE3Ni4zMiA2Ni4zOSAxNzcuMzQgNjcuNDIgMTc3LjM0IDY5LjciIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMTg1LjgxIDY2LjUyIDE4NS44MSA3My44NiAxODQuMTggNzMuODYgMTg0LjE4IDcwLjkyIDE4MC45NCA3MC45MiAxODAuOTQgNzMuODYgMTc5LjMxIDczLjg2IDE3OS4zMSA2Ni41MiAxODAuOTQgNjYuNTIgMTgwLjk0IDY5LjQzIDE4NC4xOCA2OS40MyAxODQuMTggNjYuNTIgMTg1LjgxIDY2LjUyWiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xOTEuMTcgNzAuNyAxOTEuMTcgNjkuNzFDMTkxLjE3IDY3LjQzIDE5Mi4yNCA2Ni40IDE5NC41MSA2Ni40IDE5NS42IDY2LjQgMTk2LjM1IDY2LjY0IDE5Ny4wMiA2Ny4xNUwxOTYuMTcgNjguNDRDMTk1Ljc2IDY4LjA5IDE5NS4xOCA2Ny44OSAxOTQuNTUgNjcuODkgMTkzLjQyIDY3Ljg5IDE5Mi44NCA2OC40MSAxOTIuODQgNjkuODlMMTkyLjg0IDcwLjU1QzE5Mi44NCA3Mi4wMiAxOTMuNCA3Mi41MyAxOTQuNTUgNzIuNTMgMTk1LjE4IDcyLjUzIDE5NS43NSA3Mi4zMiAxOTYuMTggNzIuMDNMMTk3LjA0IDczLjI3QzE5Ni4zNSA3My43NyAxOTUuNiA3NC4wMiAxOTQuNTEgNzQuMDIgMTkyLjI0IDc0LjAyIDE5MS4xNyA3Mi45OSAxOTEuMTcgNzAuNzIiIGNsYXNzPSJNc2Z0T2ZjVGhtX0JhY2tncm91bmQxX0ZpbGxfdjIiIGZpbGw9IiNGRkZGRkYiLz48cmVjdCB4PSIxOTguNTIiIHk9IjY2LjUyIiB3aWR0aD0iMS42MyIgaGVpZ2h0PSI3LjM0IiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTIwNy40MiA2OCAyMDUuMjggNjggMjA1LjI4IDczLjg2IDIwMy42NSA3My44NiAyMDMuNjUgNjggMjAxLjUyIDY4IDIwMS41MSA2Ni41MiAyMDcuNDIgNjYuNTIgMjA3LjQyIDY4WiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0yMTQuNzMgNjYuNTIgMjExLjk4IDcxLjAzIDIxMS45OCA3My44NiAyMTAuMzUgNzMuODYgMjEwLjM1IDcxLjAzIDIwNy41OCA2Ni41MiAyMDkuNDkgNjYuNTIgMjExLjIxIDY5LjM2IDIxMi45NCA2Ni41MiAyMTQuNzMgNjYuNTJaIiBjbGFzcz0iTXNmdE9mY1RobV9CYWNrZ3JvdW5kMV9GaWxsX3YyIiBmaWxsPSIjRkZGRkZGIi8+PGc+PHBhdGggZD0iTTEwNi4yMSAzMS4xNkMxMDYuMjEgMzEuMTYgMTA3LjY5IDMyLjI4IDEwOC42OSAzMi45OCAxMDkuMDMgMzMuMjMgMTA4LjMyIDMzLjMyIDEwNy41MiAzMy44MiAxMDYuODYgMzQuMjEgMTA3LjU4IDM0Ljg5IDEwOC4yIDM0Ljg2IDEwOC44MyAzNC44MyAxMDkuMTcgMzQuMSAxMDkuNjggMzQuMDcgMTEwLjE2IDM0LjA0IDExMS43IDM1LjM2IDExMi45MyAzNi4xNSAxMTQuMTkgMzYuOTQgMTE0LjY0IDM3LjEgMTE1LjM1IDM2LjQgMTE3LjY5IDM0LjA0IDExNS42MyAzNS4wOCAxMTUuMDYgMzUuMjJMMTExLjI3IDMyLjg5QzExMS4wMSAzMi43MiAxMTEuNDEgMzIuNDQgMTExLjc1IDMyLjEgMTEyLjE4IDMxLjcxIDExMi40OSAzMS4yOSAxMTEuNjkgMzAuODcgMTEwLjg5IDMwLjQ4IDExMC42MSAzMS4yOSAxMTAuMzUgMzEuNzEgMTEwLjEyIDMyLjEzIDEwOS43OCAzMi4wMiAxMDkuNTggMzEuODhMMTA3LjQ0IDMwLjM3QzExOC45IDIyLjM3IDEyOC42NSAyMy43NSAxMjguNjUgMjMuNzUgMTI4LjY1IDIzLjc1IDEyNS4zNyAyMi4yNiAxMTguOSAyMy42NCAxMTIuNDMgMjUuMDEgMTA2LjE2IDI5LjUgMTA2LjE2IDI5LjUgMTA2LjIyIDI5LjUgOTkuOTUgMjUuMDEgOTMuNDcgMjMuNjQgODcgMjIuMjYgODMuNzIgMjMuNzUgODMuNzIgMjMuNzUgODMuNzIgMjMuNzUgOTMuNDcgMjIuMzcgMTA0LjkzIDMwLjM3TDEwMi43OSAzMS44OEMxMDIuNTkgMzIuMDIgMTAyLjI1IDMyLjEzIDEwMi4wMiAzMS43MSAxMDEuNzYgMzEuMjkgMTAxLjQ4IDMwLjQ4IDEwMC42OCAzMC44NyA5OS44OCAzMS4yOSAxMDAuMiAzMS43MSAxMDAuNjIgMzIuMSAxMDAuOTYgMzIuNDQgMTAxLjM2IDMyLjcyIDEwMS4xIDMyLjg5TDk3LjMxIDM1LjIyQzk2Ljc0IDM1LjA4IDk0LjY5IDM0LjA0IDk3LjAzIDM2LjQgOTcuNzQgMzcuMSA5OC4yIDM2LjkzIDk5LjQ1IDM2LjE1IDEwMC42OCAzNS4zNiAxMDIuMjIgMzQuMDUgMTAyLjcgMzQuMDcgMTAzLjIxIDM0LjEgMTAzLjU1IDM0LjgzIDEwNC4xOCAzNC44NiAxMDQuODEgMzQuODkgMTA1LjUyIDM0LjIxIDEwNC44NiAzMy44MiAxMDQuMDYgMzMuMzEgMTAzLjM1IDMzLjIzIDEwMy42OSAzMi45OCAxMDQuNjkgMzIuMjggMTA2LjE3IDMxLjE2IDEwNi4xNyAzMS4xNiIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0xMTMuNTEgMTAuNjRDMTEzLjA4IDguMzEgMTExLjIgNy40NyAxMDkuNzIgNy40NCAxMTAuODYgNi40IDExMy4xNCA2LjU3IDExNC41NCA3LjY2IDExMy41NyA1LjE5IDExMS4wMSA0LjE1IDEwOC41IDUuMzMgMTA4LjkgNC4xMiAxMTEuMzUgMi45MiAxMTMuMTcgMy42OCAxMTEuNjMgMi4zMyAxMDkuMjQgMS44IDEwNy4xMyAzLjM3IDEwNy4wNyAyLjEzIDEwNi44NSAxLjA3IDEwNi4xOS0wLjAxIDEwNi4xOS0wLjAxIDEwNi4xOS0wLjAxIDEwNi4xOS0wLjAxIDEwNS41MyAxLjA2IDEwNS4zMSAyLjEyIDEwNS4yNiAzLjM2IDEwMy4xNSAxLjc5IDEwMC43NiAyLjMyIDk5LjIxIDMuNjcgMTAxLjA0IDIuOTEgMTAzLjQ5IDQuMTIgMTAzLjg5IDUuMzIgMTAxLjM4IDQuMTQgOTguODEgNS4xOCA5Ny44NSA3LjY1IDk5LjI1IDYuNTYgMTAxLjUzIDYuMzkgMTAyLjY3IDcuNDMgMTAxLjE5IDcuNDYgOTkuMzEgOC4zIDk4Ljg4IDEwLjYzIDEwMC4wOCA5LjU2IDEwMS43OSA5LjE3IDEwMy41OCA5LjU0IDEwMy4xNSA5LjYyIDEwMi43IDkuNzQgMTAyLjI0IDkuOTYgMTAwLjU5IDEwLjg2IDEwMC4zNiAxMi42OCAxMDAuMzYgMTIuNjggMTAwLjM2IDEyLjY4IDEwMS45IDExLjMzIDEwNC4yNyAxMS40MiAxMDQuNTYgMTEuNDIgMTA0LjgxIDExLjQyIDEwNS4wNCAxMS40OEwxMDUuMSAxMS42NSAxMDUuMSAyNS4yN0MxMDMuOTkgMjUuMzggMTAyLjk5IDI1LjY5IDEwMi4zOSAyNi4yMyAxMDIuMzkgMjYuMjMgMTA1LjUgMjcuODMgMTA2LjIxIDI4LjQyIDEwNi45MiAyNy44MyAxMTAuMDMgMjYuMjMgMTEwLjAzIDI2LjIzIDEwOS40MyAyNS43IDEwOC40MyAyNS4zOSAxMDcuMzIgMjUuMjdMMTA3LjMyIDExLjY1IDEwNy4zOCAxMS40OEMxMDcuNjEgMTEuNDIgMTA3Ljg2IDExLjQyIDEwOC4xNSAxMS40MiAxMTAuNTIgMTEuMzQgMTEyLjA2IDEyLjY4IDExMi4wNiAxMi42OCAxMTIuMDYgMTIuNjggMTExLjgzIDEwLjg2IDExMC4xOCA5Ljk2IDEwOS43MiA5Ljc0IDEwOS4yNyA5LjYyIDEwOC44NCA5LjU0IDExMC42NCA5LjE3IDExMi4zNSA5LjU3IDExMy41NSAxMC42MyIgY2xhc3M9Ik1zZnRPZmNUaG1fQmFja2dyb3VuZDFfRmlsbF92MiIgZmlsbD0iI0ZGRkZGRiIvPjwvZz48L2c+PC9nPjwvc3ZnPg==" alt="الهيئة الملكية" style="height:36px;opacity:.95;filter:brightness(1.1)">
+    <div style="border-right:1px solid rgba(181,157,97,.35);padding-right:14px">متابعة الاجتماع الأسبوعي <span style="color:rgba(181,157,97,.8)">— الإعلام والتواصل</span></div>
+  </div>
+  <div class="nav-date" style="color:rgba(181,157,97,.9)" id="navDateDisplay">📅 ...</div>
+  <div id="userBadge" style="display:none;align-items:center;gap:8px;padding:0 1rem;cursor:pointer" onclick="changeDept()" title="تغيير القسم">
+    <div style="background:linear-gradient(135deg,rgba(181,157,97,.25),rgba(181,157,97,.1));border:1.5px solid rgba(181,157,97,.6);border-radius:24px;padding:6px 16px;font-size:13px;font-weight:700;color:#e8c97a;white-space:nowrap;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.2)" id="userBadgeText">👤 ...</div>
+  </div>
+  <div id="syncIndicator" style="display:none;align-items:center;gap:6px;color:rgba(181,157,97,.8);font-size:12px;padding:0 1rem">
+    <div style="width:8px;height:8px;border-radius:50%;background:#B59D61;animation:pulse 1s infinite"></div>
+    جاري التحميل...
+  </div>
+  <div class="nav-tabs" id="navTabs">
+    <button class="nav-tab active" onclick="showPage('dash',this)">📊 لوحة التحكم</button>
+    <button class="nav-tab" onclick="showPage('tracker',this)">📋 متابعة المهام</button>
+    <button class="nav-tab" onclick="showPage('calendar',this)">📅 التقويم الأسبوعي</button>
+  </div>
+</nav>
+
+<!-- ══ DASHBOARD PAGE ══ -->
+<div id="page-dash" class="page active">
+  <div class="dash-header">
+    <div>
+      <h1>لوحة التحكم</h1>
+      <p>نظرة شاملة على مهام الإدارة العامة للإعلام والتواصل</p>
+    </div>
+    <div class="dash-week-badge">الأسبوع: 12 – 18 أبريل 2026</div>
+  </div>
+
+  <div class="dash-grid">
+
+    <!-- Row 1: Main KPIs -->
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <!-- Row 2: In Progress priority breakdown -->
+    <div class="dash-card" style="margin-top:0">
+      <div class="dash-card-title"><span class="dot" style="background:var(--blue)"></span>قيد التنفيذ — توزيع الأولوية</div>
+      <div id="priorityBreakdown" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:.5rem"></div>
+    </div>
+
+    <!-- Row 3: Dept table + activity -->
+    <div class="dash-two">
+      <div class="dash-card" style="grid-column:span 2">
+        <div class="dash-card-title"><span class="dot" style="background:var(--green)"></span>ملخص الأقسام</div>
+        <table class="matrix-table" id="deptMatrix"></table>
+      </div>
+    </div>
+    <div class="dash-card">
+      <div class="dash-card-title"><span class="dot" style="background:var(--amber)"></span>ملخص تحديثات الأسبوع</div>
+      <div id="activityFeed"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TRACKER PAGE ══ -->
+<div id="page-tracker" class="page">
+  <div class="tracker-header">
+    <div>
+      <h1>متابعة المهام</h1>
+      <p style="font-size:13px;color:var(--ink2);margin-top:2px">انقر على أي حقل لتعديله مباشرة</p>
+    </div>
+    <button class="add-task-btn" onclick="openAddModal()">+ إضافة مهمة</button>
+  </div>
+
+  <div class="search-wrap">
+    <input class="search-input" placeholder="🔍 ابحث في المهام..." oninput="applyFilters()" id="searchInput">
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-row">
+      <span class="filter-lbl">الحالة:</span>
+      <button class="fbtn fs-active" onclick="setStatus(null,this)">الكل</button>
+      <button class="fbtn" onclick="setStatus('In Progress',this)">قيد التنفيذ</button>
+      <button class="fbtn" onclick="setStatus('Open',this)">مفتوح</button>
+      <button class="fbtn" onclick="setStatus('Completed',this)">مكتمل</button>
+      <button class="fbtn" onclick="setStatus('Completed+Stage',this)">مكتمل + مرحلة تالية</button>
+      <button class="fbtn" onclick="setStatus('Fully Closed',this)">مغلق كليًا</button>
+      <button class="fbtn" onclick="setStatus('Late',this)">متأخر</button>
+    </div>
+    <div class="filter-row" id="deptFilterRow">
+      <span class="filter-lbl">القسم:</span>
+      <button class="fbtn fd-active" onclick="setDept(null,this)">الكل</button>
+    </div>
+  </div>
+
+  <div class="dept-list" id="deptList"></div>
+</div>
+
+<!-- ══ ADD/EDIT MODAL ══ -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal">
+    <h2 id="modalTitle">إضافة مهمة جديدة</h2>
+    <div class="form-two">
+      <div class="form-row">
+        <label class="form-label">القسم</label>
+        <select class="form-select" id="fDept"></select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">الأولوية</label>
+        <select class="form-select" id="fPrio">
+          <option value="High">عالية</option>
+          <option value="Medium" selected>متوسطة</option>
+          <option value="Low">منخفضة</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">المهمة / الإجراء</label>
+      <input class="form-input" id="fName" placeholder="أدخل وصف المهمة...">
+    </div>
+    <div class="form-two">
+      <div class="form-row">
+        <label class="form-label">الحالة</label>
+        <select class="form-select" id="fStatus">
+          <option value="Open">مفتوح</option>
+          <option value="In Progress" selected>قيد التنفيذ</option>
+          <option value="Completed">مكتمل</option>
+          <option value="Fully Closed">مغلق كليًا</option>
+          <option value="Late">متأخر</option>
+          <option value="On Hold">معلق</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">تاريخ الاستحقاق</label>
+        <input class="form-input" id="fDue" type="date">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">ملاحظات / تحديثات</label>
+      <textarea class="form-textarea" id="fComment" placeholder="أضف ملاحظاتك هنا..."></textarea>
+    </div>
+    <div class="form-row">
+      <label class="form-label">أعضاء الفريق</label>
+      <input class="form-input" id="fTeam" placeholder="أسماء الأعضاء...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+      <button class="btn-primary" onclick="saveModal()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CALENDAR PAGE ══ -->
+<div id="page-calendar" class="page">
+  <div class="cal-page-header">
+    <div>
+      <h1>التقويم الأسبوعي</h1>
+      <p style="font-size:13px;color:var(--ink2);margin-top:2px">انقر على + لإضافة حدث في أي يوم</p>
+    </div>
+  </div>
+  <div class="cal-body" id="calBody"></div>
+</div>
+
+<!-- EVENT MODAL -->
+<div class="ev-modal-overlay hidden" id="evModalOverlay">
+  <div class="ev-modal">
+    <h2 id="evModalTitle">إضافة حدث</h2>
+    <div class="form-row">
+      <label class="form-label">اسم المهمة / الحدث</label>
+      <input class="form-input" id="evTitle" placeholder="اسم المهمة أو الحدث...">
+    </div>
+    <div class="form-row">
+      <label class="form-label">التصنيف</label>
+      <select class="form-select" id="evDept">
+        <option value="">— اختر التصنيف —</option>
+        <option value="📢 الأنشطة الإعلامية">📢 الأنشطة الإعلامية</option>
+        <option value="💬 التواصل الداخلي">💬 التواصل الداخلي</option>
+        <option value="📌 أخرى">📌 أخرى</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEvModal()">إلغاء</button>
+      <button class="btn-primary tbl-btn del-btn" id="evDeleteBtn" onclick="deleteEvent()" style="background:var(--red-bg);color:var(--red);border:1px solid var(--red);display:none">حذف</button>
+      <button class="btn-primary" onclick="saveEvent()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+// DATA
+// ══════════════════════════════════
+let depts = [
+  {id:1,name:"التنسيق والتدفق الإعلامي",owner:"عبدالله العتيبي",tasks:[
+    {id:101,n:"طلب مشاركة الهيئة في مبادرة الثقافة العدلية",p:"High",s:"In Progress",c:"تم تحديد اجتماع خلال الاسبوع لمناقشة تفاصيل المبادرة. جاري دراسة مقترح المشاركة مع القطاعات",team:"",due:"",updated:Date.now()-3600000},
+    {id:102,n:"مشاركة الهيئة في منتدى الاستثمار الرياضي",p:"Medium",s:"In Progress",c:"تمت موافقة المعالي على الرعاية الاستراتيجية. تم عقد اجتماع مع قطاع الرياضة في الهيئة. تم الدعم الاعلامي من خلال خبر صحفي في واس والموقع الالكتروني",team:"",due:"",updated:Date.now()-7200000},
+    {id:103,n:"مشاركة في مؤتمر Leap القادم",p:"",s:"In Progress",c:"سيتم بحث نوعية المشاركة (مقترح الحي الرقمي)",team:"",due:"",updated:0},
+    {id:104,n:"مشروع القواعد والاجراءات المنظمة للتواصل الاعلامي لمؤسسة الرياض غير الربحية",p:"",s:"Completed",c:"تم تزويدهم بتعديلات وملاحظات",team:"",due:"",updated:Date.now()-86400000},
+    {id:105,n:"حفل تسليم جوائز الدورة الثانية عشرة لجائزة الأمير سلطان بن عبدالعزيز العالمية للمياه",p:"",s:"In Progress",c:"تم ابداء الملاحظات على الخطة الاعلامية وارسالها الى القطاع",team:"",due:"",updated:0},
+    {id:106,n:'بحث فرص التعاون لإطلاق مبادرة "الثقافة العدلية"',p:"",s:"In Progress",c:"جاري بحث نوعية المشاركة داخليًا",team:"",due:"",updated:0},
+    {id:107,n:"طلب تصوير جاهزية الممرات لقطار",p:"",s:"In Progress",c:"تصوير قبل الافتتاح الرسمي. العروبة (جاهز). غرناطة (جاهز). د. سليمان الحبيب (متوقع خلال شهر)",team:"",due:"",updated:0},
+    {id:108,n:"ملف احتفاء بالرؤية 2030",p:"High",s:"Open",c:"",team:"",due:"",updated:0},
+  ]},
+  {id:2,name:"التخطيط الإعلامي",owner:"صالح الزويد",tasks:[
+    {id:201,n:"استديو الرياض العمراني",p:"Medium",s:"In Progress",c:"بانتظار الموافقات من معالي المهندس إبراهيم السلطان. اجتماع 14/4 مع قطاع التخطيط",team:"",due:"",updated:0},
+    {id:202,n:"منصة نطاق",p:"Medium",s:"In Progress",c:"حاليًا لا يوجد تاريخ نهائي للتسليم",team:"",due:"",updated:0},
+    {id:203,n:"اعلان الحزمة الرابعة - برنامج محاور الطرق",p:"High",s:"Completed",c:"بانتظار موافقة اللجنة الإعلامية العليا",team:"",due:"",updated:Date.now()-43200000},
+    {id:204,n:"التفاعل مع كأس العالم للرياضات الاكترونية",p:"Medium",s:"In Progress",c:"",team:"",due:"",updated:0},
+    {id:205,n:"مشروع المخطط الشامل للرياض",p:"High",s:"In Progress",c:"",team:"",due:"",updated:0},
+    {id:206,n:"الاحتفاء بالذكرى العاشرة للرؤية 2030",p:"High",s:"In Progress",c:"اجتماع 13-4-2026 لمتابعة تنفيذ الخطة",team:"",due:"",updated:Date.now()-10800000},
+    {id:207,n:"تشغيل محطة الحديدة في الغربية مسار ثلاثة",p:"High",s:"In Progress",c:"تشغيل المحطة آخر الشهر. زيارة ميدانية الخميس من 1 إلى 2",team:"",due:"",updated:0},
+    {id:208,n:"تفعيل تحويلة تقاطع طريق الثمامة مع طريق عثمان بن عفان",p:"High",s:"In Progress",c:"تم اعداد الوثيقة. التفعيل سيكون يوم الأربعاء",team:"",due:"",updated:0},
+  ]},
+  {id:3,name:"العمليات الإعلامية",owner:"نايف الوعيل",tasks:[
+    {id:301,n:"تطوير مخرجات اعلامية",p:"High",s:"In Progress",c:"",team:"",due:"",updated:0},
+    {id:302,n:"الاعلان عن الحي الرقمي",p:"High",s:"Completed",c:"بانتظار الاعتماد النهائي من مكتب ولي العهد. سيتم الاعلان مع LEAP",team:"",due:"",updated:Date.now()-21600000},
+    {id:303,n:"تطوير مواد مرئية (4 فيديو) لمحاور الطرق",p:"High",s:"In Progress",c:"هنالك اشكالية في استخدام الدرون. سيتم انجاز أحد الفيديوات نهاية الاسبوع",team:"",due:"",updated:0},
+    {id:304,n:"التفاعل مع منتدى الاستثمار الرياضي",p:"High",s:"Completed",c:"تم الدعم الاعلامي من خلال نشر خبر صحفي في واس والموقع الالكتروني ومنشور عبر حساب الهيئة",team:"",due:"",updated:Date.now()-50400000},
+    {id:305,n:"اليوم العالمي للنقل",p:"",s:"In Progress",c:"",team:"",due:"",updated:0},
+  ]},
+  {id:4,name:"المنظومة الرقمية",owner:"محمد المشعل",tasks:[
+    {id:401,n:"تنفيذ متطلبات قياس التحول الرقمي",p:"High",s:"In Progress",c:"متابعة تطبيق المؤشرات والموائمة مع فريق تقنية المعلومات",team:"",due:"28/04/2026",updated:0},
+    {id:402,n:"تفعيل الخدمات الالكترونية بموقع الهيئة",p:"High",s:"In Progress",c:"تفعيل خدمة حجز مواقع الكرافانات. تطوير خطط إعلامية للترويج عن الخدمات",team:"",due:"",updated:0},
+    {id:403,n:"انشاء صفحة لمشروع الحي الرقمي",p:"Medium",s:"In Progress",c:"تم مشاركة النموذج، وبانتظار افادة الفريق المعني",team:"",due:"",updated:0},
+    {id:404,n:"تقارير الرصد والتحليل وتفعيل الملف الإعلامي اليومي",p:"High",s:"In Progress",c:"تحديد مواضيع للتقارير النوعية واعتماد النموذج",team:"",due:"20/04/2026",updated:0},
+    {id:405,n:"اعداد خطة نقل وتسليم مركز الاتصال الموحد للمشغل الجديد",p:"Medium",s:"In Progress",c:"اعداد وتهيئة خطة ومتطلبات نقل تشغيل مركز الاتصال",team:"",due:"23/04/2026",updated:0},
+  ]},
+  {id:5,name:"العلاقات والشراكات الإعلامية",owner:"فيصل الدخيل",tasks:[
+    {id:501,n:"حصر الاصول المكانية والرقمية بالجهات التابعة للهيئة",p:"High",s:"In Progress",c:"متوقع تسليم الملف كاملًا الى صالح يوم الأحد 19-4-2026",team:"",due:"",updated:0},
+    {id:502,n:"ملف احتفاء بالرؤية 2030",p:"High",s:"Completed",c:"تم تجهيز الملف كاملًا وتسليمه الى عبدالله العتيبي",team:"",due:"",updated:Date.now()-14400000},
+    {id:503,n:"مشروع تحديث محتوى موقع الهيئة الرسمي",p:"High",s:"Completed",c:"",team:"",due:"",updated:0},
+    {id:504,n:"المعلومات والمواد الإعلامية عن برنامج الرياض الخضراء",p:"High",s:"In Progress",c:"تم استلام المواد ومشاركتها مع مجلة الحرس الوطني",team:"",due:"",updated:0},
+    {id:505,n:"الحملة الوطنية للهيئة السعودية للمياه",p:"High",s:"In Progress",c:"تم مشاركتها مع برنامج الرياض الخضراء والنقل العام واستدامة الرياض",team:"",due:"",updated:0},
+    {id:506,n:"تصميم خطوات الدخول على الموقع لنزع ملكية العقارات",p:"High",s:"In Progress",c:"تم الاعتماد",team:"",due:"",updated:0},
+    {id:507,n:"حملة رقم سعودي للهيئة العامة للإحصاء",p:"High",s:"In Progress",c:"تم مشاركته مع الزميل سليمان الخريجي",team:"",due:"",updated:0},
+    {id:508,n:"خطوات التأكد من نزع ملكية العقارات المتعارضة مع محاور الطرق",p:"High",s:"Completed",c:"تم الاعلان في أم القرى وصحيفة الرياض والجزيرة",team:"",due:"",updated:Date.now()-30000},
+  ]},
+  {id:6,name:"التواصل الداخلي",owner:"عبدالله النشوان",tasks:[
+    {id:601,n:"تفعيل الايميل الداخلي للادارة العامة للاعلام والتواصل",p:"Medium",s:"Fully Closed",c:"mediacom@rcrc.gov.sa",team:"",due:"",updated:Date.now()-5000},
+    {id:602,n:"متطلبات قياس التحول الرقمي",p:"High",s:"In Progress",c:"تحقيق المؤشرات المطلوبة وجاري العمل على التحديث",team:"",due:"",updated:0},
+  ]},
+  {id:7,name:"الفعاليات والمعارض",owner:"محمد الموسى",tasks:[
+    {id:701,n:"تسليم الدفعة الاولى",p:"High",s:"In Progress",c:"قيد التنسيق مع الشركة لاختيار التوزيعات",team:"",due:"",updated:0},
+    {id:702,n:"مشاركة الهيئة في معرض الإبداع والابتكار في جامعة الملك سعود",p:"Medium",s:"In Progress",c:"تم تزويدهم بالشعار والهوية",team:"",due:"",updated:0},
+  ]},
+  {id:8,name:"علاقات الضيوف والاستقبال والضيافة",owner:"علي عسيري",tasks:[]},
+  {id:9,name:"إدارة المشاريع والمتابعة",owner:"فهد المنيع",tasks:[
+    {id:901,n:"كراسة التفعيلات الداخلية",p:"High",s:"In Progress",c:"تم مشاركتها من قبل مكتب ادارة المشاريع",team:"",due:"",updated:0},
+    {id:902,n:"كراسة منظومة الاتصال المتكامل لبرنامج تطوير محاور الطرق",p:"High",s:"In Progress",c:"للمناقشة مع مدير المشروع نايف الوعيل",team:"",due:"",updated:0},
+    {id:903,n:"بناء وتفعيل استراتيجيات التواصل لمشروع تحقيق التوازن العقاري",p:"High",s:"In Progress",c:"تم مشاركتها من قبل مكتب ادارة المشاريع",team:"",due:"",updated:0},
+    {id:904,n:"كراسة تأسيس وتشغيل مركز المستفيدين للهيئة الملكية لمدينة الرياض",p:"High",s:"In Progress",c:"تم مشاركتها من قبل مكتب ادارة المشاريع",team:"",due:"",updated:0},
+    {id:905,n:"كراسة تطوير وتشغيل المركز الإعلامي للهيئة الملكية لمدينة الرياض",p:"Medium",s:"In Progress",c:"تم مشاركتها من قبل مكتب ادارة المشاريع",team:"",due:"",updated:0},
+  ]},
+];
+
+let nextId = 1100;
+let activeStatus = null;
+let activeDept = null;
+const openStates = {};
+let editingTask = null;
+
+// ══════════════════════════════════
+// HELPERS
+// ══════════════════════════════════
+const statusMap = {
+  'In Progress':{cls:'s-prog',label:'قيد التنفيذ'},
+  'Open':{cls:'s-open',label:'مفتوح'},
+  'Completed':{cls:'s-comp',label:'مكتمل'},
+  'Fully Closed':{cls:'s-closed',label:'مغلق كليًا'},
+  'Late':{cls:'s-late',label:'متأخر'},
+  'On Hold':{cls:'s-hold',label:'معلق'},
+};
+const prioMap = {
+  'High':{cls:'p-high',label:'عالية'},
+  'Medium':{cls:'p-med',label:'متوسطة'},
+  'Low':{cls:'p-low',label:'منخفضة'},
+};
+const statusColors = {'In Progress':'#154d8a','Open':'#8a4f00','Completed':'#1a6b45','Fully Closed':'#065f46','Late':'#8f1c1c','On Hold':'#4a4a4a'};
+const statusBgColors = {'In Progress':'#e5eef8','Open':'#fef3dc','Completed':'#e6f4ee','Fully Closed':'#d1fae5','Late':'#fdeaea','On Hold':'#f0f0f0'};
+
+function badge(map,key){
+  if(!key||!map[key]) return '';
+  const {cls,label}=map[key];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function allTasks(){return depts.flatMap(d=>d.tasks)}
+function getStats(){
+  const all=allTasks();
+  const byStatus={};
+  Object.keys(statusMap).forEach(s=>byStatus[s]=0);
+  all.forEach(t=>{if(byStatus[t.s]!==undefined)byStatus[t.s]++;});
+  const inProgress=all.filter(t=>t.s==='In Progress');
+  return {
+    total:all.length,
+    byStatus,
+    high:all.filter(t=>t.p==='High'&&t.s!=='Completed').length,
+    withNextStage:all.filter(t=>t.s==='Completed'&&t.nextStage).length,
+    inProgressHigh:   inProgress.filter(t=>t.p==='High').length,
+    inProgressMedium: inProgress.filter(t=>t.p==='Medium'||(!t.p||t.p==='')).length,
+    inProgressLow:    inProgress.filter(t=>t.p==='Low').length,
+  };
+}
+function timeAgo(ts){
+  if(!ts) return '';
+  const s=Math.floor((Date.now()-ts)/1000);
+  if(s<60) return 'الآن';
+  if(s<3600) return `منذ ${Math.floor(s/60)} دقيقة`;
+  if(s<86400) return `منذ ${Math.floor(s/3600)} ساعة`;
+  return `منذ ${Math.floor(s/86400)} يوم`;
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ══════════════════════════════════
+// PAGES
+// ══════════════════════════════════
+
+// ══════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════
+function renderDash(){
+  const stats=getStats();
+  const activeTotal = stats.total - stats.byStatus['Completed'];
+
+  // ── KPI cards ──
+  const kpis=[
+    {label:'إجمالي المهام',val:activeTotal,sub:'باستثناء المكتملة',cls:'k-total',color:'var(--accent)',icon:'📊'},
+    {label:'قيد التنفيذ',val:stats.byStatus['In Progress'],sub:'مهام نشطة',cls:'k-prog',color:'#154d8a',icon:'⚙️'},
+    {label:'مفتوح',val:stats.byStatus['Open'],sub:'لم تبدأ بعد',cls:'k-open',color:'var(--amber)',icon:'📂'},
+    {label:'متأخر',val:stats.byStatus['Late'],sub:'تجاوزت الموعد',cls:'k-high',color:'#8f1c1c',icon:'⚠️'},
+    {label:'معلق',val:stats.byStatus['On Hold'],sub:'في الانتظار',cls:'k-depts',color:'#4a4a4a',icon:'⏸️'},
+    {label:'مغلق كليًا',val:stats.byStatus['Fully Closed'],sub:'لا يمكن تعديلها',cls:'k-depts',color:'#065f46',icon:'🔒'},
+  ];
+  document.getElementById('kpiRow').innerHTML=kpis.map(k=>`
+    <div class="kpi ${k.cls}" style="display:flex;flex-direction:column;justify-content:space-between">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="kpi-label">${k.label}</div>
+        <span style="font-size:20px;opacity:.5">${k.icon}</span>
+      </div>
+      <div class="kpi-num" style="color:${k.color};font-size:36px;margin:.3rem 0">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+
+  // ── Priority breakdown for In Progress ──
+  const prios = [
+    {label:'أولوية عالية',val:stats.inProgressHigh,   color:'#8f1c1c',bg:'#fdeaea',icon:'🔴'},
+    {label:'أولوية متوسطة',val:stats.inProgressMedium, color:'#8a6a00',bg:'#fef6d8',icon:'🟡'},
+    {label:'أولوية منخفضة',val:stats.inProgressLow,    color:'#0d6640',bg:'#e0f2e9',icon:'🟢'},
+  ];
+  document.getElementById('priorityBreakdown').innerHTML = prios.map(p=>`
+    <div style="background:${p.bg};border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:12px;font-weight:600;color:${p.color};margin-bottom:.4rem">${p.icon} ${p.label}</div>
+        <div style="font-size:13px;color:${p.color};opacity:.75">من إجمالي قيد التنفيذ</div>
+      </div>
+      <div style="font-size:40px;font-weight:800;color:${p.color}">${p.val}</div>
+    </div>`).join('');
+
+
+
+  // Dept matrix table
+  document.getElementById('deptMatrix').innerHTML=`
+    <thead><tr>
+      <th>القسم</th>
+      <th>قيد التنفيذ</th>
+      <th>مفتوح</th>
+      <th>متأخر</th>
+      <th>معلق</th>
+      <th>مغلق كليًا</th>
+    </tr></thead>
+    <tbody>${depts.map(d=>`<tr>
+      <td><div class="dept-name-sm">${d.name.length>16?d.name.substring(0,16)+'…':d.name}</div><div class="owner-sm">${d.owner}</div></td>
+      <td>${d.tasks.filter(t=>t.s==='In Progress').length?`<span class="mini-badge mb-prog">${d.tasks.filter(t=>t.s==='In Progress').length}</span>`:'-'}</td>
+      <td>${d.tasks.filter(t=>t.s==='Open').length?`<span class="mini-badge mb-open">${d.tasks.filter(t=>t.s==='Open').length}</span>`:'-'}</td>
+      <td>${d.tasks.filter(t=>t.s==='Late').length?`<span class="mini-badge mb-late" style="background:#fdeaea;color:#8f1c1c">${d.tasks.filter(t=>t.s==='Late').length}</span>`:'-'}</td>
+      <td>${d.tasks.filter(t=>t.s==='On Hold').length?`<span class="mini-badge mb-hold" style="background:#f0f0f0;color:#4a4a4a">${d.tasks.filter(t=>t.s==='On Hold').length}</span>`:'-'}</td>
+      <td>${d.tasks.filter(t=>t.s==='Fully Closed').length?`<span class="mini-badge mb-close">${d.tasks.filter(t=>t.s==='Fully Closed').length}</span>`:'-'}</td>
+    </tr>`).join('')}</tbody>`;
+
+  // Activity feed
+  const dept4task=t=>{for(const d of depts){if(d.tasks.find(x=>x.id===t.id))return d;}return null;};
+  const statusAr={'In Progress':'قيد التنفيذ','Open':'مفتوح','Completed':'مكتمل','Fully Closed':'مغلق كليًا','Late':'متأخر','On Hold':'معلق'};
+
+  // Weekly summary — compare snapshot vs current
+  const stored = localStorage.getItem('wm_monday_snapshot');
+  const oldSnapshot = stored ? (JSON.parse(stored).data || null) : null;
+  // If no snapshot yet — show ALL current tasks as new
+  if(!oldSnapshot) {
+    const allNew = [];
+    depts.forEach(d => d.tasks.forEach(t => allNew.push({...t, deptName: d.name})));
+    const mkBox2 = (cls, icon, title, color, items, emptyMsg) => `
+      <div class="summary-box ${cls}">
+        <div class="summary-box-hdr">
+          <span class="sb-icon">${icon}</span>
+          <span style="color:${color}">${title}</span>
+          <span class="sb-count" style="color:${color}">${items.length}</span>
+        </div>
+        ${items.length ? items.map(t=>`
+          <div class="summary-box-item">
+            <div>${t.n.length>45?t.n.substring(0,45)+'…':t.n}</div>
+            <div class="sb-dept">${t.deptName}</div>
+          </div>`).join('') : `<div class="summary-box-empty">${emptyMsg}</div>`}
+      </div>`;
+    document.getElementById('activityFeed').innerHTML = `<div class="summary-boxes" style="grid-template-columns:1fr">
+      ${mkBox2('sb-new','📋','جميع المهام الحالية','#1a6b45',allNew,'لا توجد مهام')}
+    </div>`;
+    // Save snapshot now
+    try {
+      const snap = {};
+      depts.forEach(d => { snap[d.id] = d.tasks.map(t=>({id:t.id,n:t.n,s:t.s,transferred:t.transferred||''})); });
+      localStorage.setItem('wm_monday_snapshot', JSON.stringify({date:new Date().toISOString().split('T')[0], data:snap}));
+    } catch(e) {}
+    return;
+  }
+
+  const newTasks=[], completedTasks=[], changedTasks=[], transferredTasks=[];
+  depts.forEach(d => {
+    const oldTasks = oldSnapshot[d.id] || [];
+    const oldMap = {};
+    oldTasks.forEach(t => oldMap[t.id] = t);
+    d.tasks.forEach(t => {
+      if(!oldMap[t.id]) {
+        newTasks.push({...t, deptName: d.name});
+      } else {
+        const old = oldMap[t.id];
+        if(t.s !== old.s) {
+          if(t.s==='Completed'||t.s==='Fully Closed') completedTasks.push({...t, deptName:d.name, oldStatus:old.s});
+          else changedTasks.push({...t, deptName:d.name, oldStatus:old.s});
+        }
+        if(t.transferred && !old.transferred) transferredTasks.push({...t, deptName:d.name});
+      }
+    });
+  });
+
+  const mkBox = (cls, icon, title, color, items, emptyMsg) => `
+    <div class="summary-box ${cls}">
+      <div class="summary-box-hdr">
+        <span class="sb-icon">${icon}</span>
+        <span style="color:${color}">${title}</span>
+        <span class="sb-count" style="color:${color}">${items.length}</span>
+      </div>
+      ${items.length ? items.map(t=>`
+        <div class="summary-box-item">
+          <div>${t.n.length>45?t.n.substring(0,45)+'…':t.n}</div>
+          <div class="sb-dept">${t.deptName}${t.oldStatus?` · ${statusAr[t.oldStatus]||t.oldStatus} ← ${statusAr[t.s]||t.s}`:''}${t.transferred?' ← محوّل إلى: '+t.transferred:''}</div>
+        </div>`).join('') : `<div class="summary-box-empty">${emptyMsg}</div>`}
+    </div>`;
+
+  const html = `<div class="summary-boxes">
+    ${mkBox('sb-new','🆕','مهام جديدة','#1a6b45',newTasks,'لا يوجد جديد')}
+    ${mkBox('sb-done','✅','مكتملة','#1a5fa8',completedTasks,'لا يوجد مكتمل')}
+    ${mkBox('sb-changed','🔄','تغيّرت حالتها','#856404',changedTasks,'لا يوجد تغيير')}
+    ${mkBox('sb-transfer','↗️','محوّلة','#6a1b9a',transferredTasks,'لا يوجد تحويل')}
+  </div>`;
+
+  // Save snapshot for next comparison
+  try {
+    const snapshot = {};
+    depts.forEach(d => { snapshot[d.id] = d.tasks.map(t=>({id:t.id,n:t.n,s:t.s,transferred:t.transferred||''})); });
+    localStorage.setItem('wm_monday_snapshot', JSON.stringify({date:new Date().toISOString().split('T')[0], data:snapshot}));
+  } catch(e) {}
+
+  document.getElementById('activityFeed').innerHTML = html;
+}
+
+// ══════════════════════════════════
+// TRACKER
+// ══════════════════════════════════
+function buildDeptFilters(){
+  const row=document.getElementById('deptFilterRow');
+  // remove old dept buttons (keep "الكل")
+  while(row.children.length>2) row.removeChild(row.lastChild);
+  depts.forEach(d=>{
+    const btn=document.createElement('button');
+    btn.className='fbtn';
+    btn.textContent=`${d.id}. ${d.name.split(' ')[0]}`;
+    btn.title=d.name;
+    btn.onclick=()=>setDept(d.id,btn);
+    row.appendChild(btn);
+  });
+}
+
+function renderTracker(){
+  buildDeptFilters();
+  applyFilters();
+}
+
+function applyFilters(){
+  const q=(document.getElementById('searchInput')?.value||'').trim().toLowerCase();
+  const container=document.getElementById('deptList');
+  container.innerHTML='';
+
+  depts.forEach((d,di)=>{
+    if(activeDept&&activeDept!==d.id) return;
+    let tasks=d.tasks;
+    if(activeStatus==='Completed+Stage') tasks=tasks.filter(t=>t.s==='Completed'&&t.nextStage);
+    else if(activeStatus) tasks=tasks.filter(t=>t.s===activeStatus);
+    if(q) tasks=tasks.filter(t=>t.n.includes(q)||t.c.includes(q));
+
+    const isOpen=openStates[di]!==false;
+    const card=document.createElement('div');
+    card.className='dept-card';
+    card.id='dc-'+di;
+
+    let rows='';
+    if(tasks.length===0){
+      rows=`<div class="no-tasks">لا توجد مهام تطابق الفلتر</div>`;
+    } else {
+      rows=`<table class="tasks-tbl">
+        <thead><tr>
+          <th style="width:32px">#</th>
+          <th style="width:200px">المهمة</th>
+          <th>التفاصيل / الملاحظات</th>
+          <th style="width:130px">الحالة</th>
+          <th style="width:90px">الأولوية</th>
+          <th style="width:90px">الإجراءات</th>
+        </tr></thead>
+        <tbody>${tasks.map((t,i)=>{
+          const locked = t.s==='Fully Closed';
+          return `
+          <tr class="task-row" id="tr-${t.id}" ${(locked||(window._myDeptId&&d.id!==window._myDeptId&&!IS_MASTER))?'style="background:#f5faf7;opacity:.85"':''}>
+            <td style="color:var(--ink3);font-size:12px">${i+1}${locked?'<span title="مغلق كليًا" style="margin-right:3px;font-size:10px">🔒</span>':''}</td>
+            <td>
+              ${locked
+                ? `<div class="task-name" style="color:var(--ink2)">${t.n}</div>`
+                : `<div class="task-name" ondblclick="editName(${t.id},this)" title="انقر مرتين للتعديل">${t.n}</div>
+                   <input class="inline-edit" id="ne-${t.id}" value="${t.n.replace(/"/g,'&quot;')}" onblur="saveName(${t.id})" onkeydown="if(event.key==='Enter')this.blur()">`
+              }
+              ${t.due?`<div style="font-size:11px;color:var(--ink3);margin-top:3px">📅 ${t.due}</div>`:''}
+            </td>
+            <td>
+              ${locked
+                ? `<div style="font-size:12px;color:var(--ink2)">${t.c||'—'}</div>
+                   <div style="font-size:10px;color:#0d6640;margin-top:4px;display:flex;align-items:center;gap:4px">🔒 مغلق كليًا</div>`
+                : `${t.c?`<div class="task-comment" ondblclick="editComment(${t.id},this)" title="انقر مرتين للتعديل">${t.c}</div>`:
+                     `<div class="task-comment" style="color:var(--ink3);font-style:italic" ondblclick="editComment(${t.id},this)">أضف ملاحظة...</div>`}
+                   <textarea class="comment-edit" id="ce-${t.id}" onblur="saveComment(${t.id})" rows="2">${t.c}</textarea>
+                   ${t.s==='Completed'?renderNextStage(t):''}`
+              }
+            </td>
+            <td>
+              <select class="status-sel" onchange="changeStatus(${t.id},this.value)">
+                ${Object.entries(statusMap).map(([k,v])=>`<option value="${k}" ${t.s===k?'selected':''}>${v.label}</option>`).join('')}
+              </select>
+            </td>
+            <td>
+              ${locked
+                ? `<span style="font-size:11px;color:var(--ink3)">—</span>`
+                : `<select class="prio-sel" onchange="changePrio(${t.id},this.value)">
+                     ${Object.entries(prioMap).map(([k,v])=>`<option value="${k}" ${(t.p||'Medium')===k?'selected':''}>${v.label}</option>`).join('')}
+                   </select>`
+              }
+            </td>
+            <td>
+              ${locked
+                ? `<span style="font-size:11px;color:var(--ink3)">—</span>`
+                : `<div class="task-actions">
+                     <button class="tbl-btn" onclick="openEditModal(${t.id})">تعديل</button>
+                     <button class="tbl-btn del-btn" onclick="deleteTask(${t.id})">حذف</button>
+                   </div>`
+              }
+            </td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>`;
+    }
+
+    const isMyDept = IS_MASTER || !window._myDeptId || d.id === window._myDeptId;
+    card.innerHTML=`
+      <div class="dept-hdr" onclick="toggleDept(${di})" style="${!isMyDept?'opacity:.7':''}">
+        <div class="dept-hdr-left">
+          <div class="dept-num" style="${!isMyDept?'background:#e0e0e0;color:#888':''}">${d.id}</div>
+          <div>
+            <div class="dept-name">${d.name} ${!isMyDept?'<span style="font-size:11px;color:#aaa;font-weight:400">— للعرض فقط</span>':''}</div>
+            <div class="dept-owner">${d.owner}</div>
+          </div>
+        </div>
+        <div class="dept-hdr-right">
+          <span class="task-count">${tasks.length} مهمة</span>
+          <span class="chev ${isOpen?'open':''}" id="chev-${di}">▾</span>
+        </div>
+      </div>
+      <div class="dept-body" id="db-${di}" style="display:${isOpen?'':'none'}">${rows}</div>`;
+    container.appendChild(card);
+  });
+}
+
+function toggleDept(di){
+  openStates[di]=openStates[di]===false?true:false;
+  applyFilters();
+}
+function setStatus(s,btn){
+  activeStatus=s;
+  document.querySelectorAll('.filter-row:first-child .fbtn').forEach(b=>b.classList.remove('fs-active'));
+  btn.classList.add('fs-active');
+  applyFilters();
+}
+function setDept(id,btn){
+  activeDept=id;
+  document.querySelectorAll('#deptFilterRow .fbtn').forEach(b=>b.classList.remove('fd-active'));
+  btn.classList.add('fd-active');
+  applyFilters();
+}
+
+// ── INLINE EDIT ──
+function editName(tid,el){
+  el.style.display='none';
+  const inp=document.getElementById('ne-'+tid);
+  inp.style.display='block'; inp.focus(); inp.select();
+}
+async function saveName(tid){
+  const inp=document.getElementById('ne-'+tid);
+  const task=findTask(tid);
+  if(task&&inp.value.trim()){
+    task.n=inp.value.trim();
+    task.updated=Date.now();
+    await saveData();
+    showToast('تم حفظ التعديل ✓');
+  }
+  applyFilters();
+}
+function editComment(tid,el){
+  el.style.display='none';
+  const ta=document.getElementById('ce-'+tid);
+  ta.style.display='block'; ta.focus();
+}
+async function saveComment(tid){
+  const ta=document.getElementById('ce-'+tid);
+  const task=findTask(tid);
+  if(task){
+    task.c=ta.value.trim();
+    task.updated=Date.now();
+    await saveData();
+    showToast('تم حفظ الملاحظة ✓');
+  }
+  applyFilters();
+}
+async function changeStatus(tid,val){
+  const task=findTask(tid);
+  if(!task) return;
+  // if moving away from Completed, clear nextStage
+  if(task.s==='Completed' && val!=='Completed'){
+    delete task.nextStage;
+  }
+  task.s=val; task.updated=Date.now();
+  await saveData();
+  showToast('تم تحديث الحالة ✓');
+  applyFilters();
+}
+async function changePrio(tid,val){
+  const task=findTask(tid);
+  if(task){task.p=val;task.updated=Date.now();saveData();showToast('تم تحديث الأولوية ✓');}
+}
+// ── NEXT STAGE ──
+function renderNextStage(t){
+  // If already transferred — show badge only, no dropdown
+  if(t.transferred) {
+    return `<div class="next-stage-wrap">
+      <span class="next-stage-label">تم التحويل إلى</span>
+      <span class="next-stage-badge" style="background:#e0f2e9;border-color:#a7d7b8;color:#0d6640">
+        <span class="ns-arrow">→</span> ${t.transferred}
+      </span>
+    </div>`;
+  }
+
+  const deptOptions = depts.map(d=>
+    `<option value="${d.name}" ${t.nextStage===d.name?'selected':''}>${d.id}. ${d.name}</option>`
+  ).join('');
+
+  if(t.nextStage){
+    return `<div class="next-stage-wrap">
+      <span class="next-stage-label">المرحلة التالية ←</span>
+      <span class="next-stage-badge">
+        <span class="ns-arrow">▶</span>
+        <select class="next-stage-input" style="width:auto;border:none;background:transparent;color:var(--accent);font-weight:700;font-size:11px;cursor:pointer;padding:0 2px"
+          onchange="saveNextStageVal(${t.id},this.value)">
+          ${deptOptions}
+        </select>
+        <button class="ns-clear-btn" onclick="clearNextStage(${t.id})" title="إلغاء المرحلة التالية">✕</button>
+      </span>
+    </div>`;
+  }
+  return `<div class="next-stage-wrap">
+    <span class="next-stage-label">المرحلة التالية:</span>
+    <div class="next-stage-input-wrap">
+      <select class="next-stage-input" id="ns-sel-${t.id}" style="width:160px">
+        <option value="">— اختر القسم —</option>
+        ${deptOptions}
+      </select>
+      <button class="ns-save-btn" onclick="saveNextStage(${t.id})">+ حفظ</button>
+    </div>
+  </div>`;
+}
+async function moveTaskToDept(tid, deptName){
+  let task = null;
+  let fromDept = null;
+  for(const d of depts){
+    const t = d.tasks.find(x=>x.id===tid);
+    if(t){ task = t; fromDept = d; break; }
+  }
+  if(!task) return;
+  const toDept = depts.find(d=>d.name===deptName);
+  if(!toDept) return;
+
+  // 1. Keep original task as Completed in its dept — mark as transferred
+  task.updated = Date.now();
+  task.transferred = deptName; // stores who it was transferred to
+  delete task.nextStage;
+
+  // 2. Add a NEW copy to the target dept as In Progress
+  const newId = ++nextId;
+  const newTask = {
+    id: newId,
+    n: task.n,
+    s: 'In Progress',
+    p: task.p || 'Medium',
+    c: `محوّلة من: ${fromDept.name}`,
+    team: task.team || '',
+    due: task.due || '',
+    updated: Date.now()
+  };
+  toDept.tasks.push(newTask);
+
+  // 3. Save BOTH depts to Sheets so target person sees it when they log in
+  await postWrite(getSheetName(fromDept.id), deptToRows(fromDept));
+  await postWrite(getSheetName(toDept.id), deptToRows(toDept));
+}
+async function saveNextStage(tid){
+  const sel=document.getElementById('ns-sel-'+tid);
+  if(!sel) return;
+  const val=sel.value;
+  if(!val){showToast('يرجى اختيار القسم التالي');return;}
+  const task=findTask(tid);
+  if(!task) return;
+  const deptName = val;
+  if(confirm(`سيتم نقل المهمة إلى قسم "${deptName}" وتغيير حالتها إلى "قيد التنفيذ".\nهل تريد المتابعة؟`)){
+    moveTaskToDept(tid, deptName);
+    await saveData();
+    showToast(`تم نقل المهمة إلى ${deptName} ✓`);
+    applyFilters();
+    renderDash();
+  }
+}
+async function saveNextStageVal(tid,val){
+  const task=findTask(tid);
+  if(!task||!val) return;
+  if(confirm(`سيتم نقل المهمة إلى قسم "${val}" وتغيير حالتها إلى "قيد التنفيذ".\nهل تريد المتابعة؟`)){
+    moveTaskToDept(tid, val);
+    await saveData();
+    showToast(`تم نقل المهمة إلى ${val} ✓`);
+    applyFilters();
+    renderDash();
+  }
+}
+async function clearNextStage(tid){
+  const task=findTask(tid);
+  if(task){delete task.nextStage;task.updated=Date.now();saveData();showToast('تم إلغاء المرحلة التالية');}
+  applyFilters();
+}
+
+function findTask(tid){
+  for(const d of depts){const t=d.tasks.find(x=>x.id===tid);if(t)return t;}
+  return null;
+}
+async function deleteTask(tid){
+  if(!confirm('هل أنت متأكد من حذف هذه المهمة؟')) return;
+  for(const d of depts){const i=d.tasks.findIndex(x=>x.id===tid);if(i!==-1){d.tasks.splice(i,1);break;}}
+  showToast('تم حذف المهمة');
+  await saveData();
+  applyFilters();
+}
+
+// ── MODAL ──
+function openAddModal(){
+  editingTask=null;
+  document.getElementById('modalTitle').textContent='إضافة مهمة جديدة';
+  document.getElementById('fName').value='';
+  document.getElementById('fComment').value='';
+  document.getElementById('fTeam').value='';
+  document.getElementById('fDue').value='';
+  document.getElementById('fStatus').value='In Progress';
+  document.getElementById('fPrio').value='';
+  buildDeptSelect(null);
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+function openEditModal(tid){
+  const task=findTask(tid);
+  if(!task) return;
+  editingTask=tid;
+  document.getElementById('modalTitle').textContent='تعديل المهمة';
+  document.getElementById('fName').value=task.n;
+  document.getElementById('fComment').value=task.c;
+  document.getElementById('fTeam').value=task.team||'';
+  document.getElementById('fDue').value=task.due||'';
+  document.getElementById('fStatus').value=task.s;
+  document.getElementById('fPrio').value=task.p||'';
+  const dept=depts.find(d=>d.tasks.some(t=>t.id===tid));
+  buildDeptSelect(dept?dept.id:null);
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+function buildDeptSelect(selId){
+  const selectedId = selId || activeDeptId;
+  if(!IS_MASTER && activeDeptId) {
+    // Staff: only show their own dept, locked
+    const dept = depts.find(d=>d.id===activeDeptId);
+    document.getElementById('fDept').innerHTML = dept
+      ? `<option value="${dept.id}" selected>${dept.id}. ${dept.name}</option>`
+      : '';
+    document.getElementById('fDept').disabled = true;
+  } else {
+    // Master: show all depts
+    document.getElementById('fDept').innerHTML = depts.map(d=>
+      `<option value="${d.id}" ${d.id===selectedId?'selected':''}>${d.id}. ${d.name}</option>`
+    ).join('');
+    document.getElementById('fDept').disabled = false;
+  }
+}
+function closeModal(){document.getElementById('modalOverlay').classList.add('hidden');}
+async function saveModal(){
+  const name=document.getElementById('fName').value.trim();
+  if(!name){alert('يرجى إدخال اسم المهمة');return;}
+  const deptId=parseInt(document.getElementById('fDept').value);
+  const dept=depts.find(d=>d.id===deptId);
+  if(!dept) return;
+  if(editingTask){
+    const task=findTask(editingTask);
+    if(task){
+      task.n=name;
+      task.s=document.getElementById('fStatus').value;
+      task.p=document.getElementById('fPrio').value;
+      task.c=document.getElementById('fComment').value.trim();
+      task.team=document.getElementById('fTeam').value.trim();
+      task.due=document.getElementById('fDue').value;
+      task.updated=Date.now();
+      // if moved away from Completed, clear nextStage
+      if(task.s!=='Completed') delete task.nextStage;
+      // move dept if changed
+      for(const d of depts){
+        const i=d.tasks.findIndex(x=>x.id===editingTask);
+        if(i!==-1&&d.id!==deptId){d.tasks.splice(i,1);dept.tasks.push(task);break;}
+      }
+      showToast('تم حفظ التعديلات ✓');
+      await saveData();
+    }
+  } else {
+    const newTask={
+      id:++nextId,
+      n:name,
+      s:document.getElementById('fStatus').value,
+      p:document.getElementById('fPrio').value,
+      c:document.getElementById('fComment').value.trim(),
+      team:document.getElementById('fTeam').value.trim(),
+      due:document.getElementById('fDue').value,
+      updated:Date.now()
+    };
+    dept.tasks.push(newTask);
+    showToast('تمت إضافة المهمة ✓');
+    await saveData();
+  }
+  closeModal();
+  applyFilters();
+}
+document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('evModalOverlay').addEventListener('click',function(e){if(e.target===this)closeEvModal();});
+
+// ══════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════
+// Weeks: Apr 12-16 (this week) and Apr 19-23 (next week)
+// ── DYNAMIC WEEK GENERATOR (auto-updates every Sunday) ──
+const DAY_NAMES_AR = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const MONTH_NAMES_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+function getWeekStart(d) {
+  const dt = new Date(d);
+  dt.setDate(dt.getDate() - dt.getDay()); // back to Sunday
+  dt.setHours(0,0,0,0);
+  return dt;
+}
+function toISO(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+function pad2(n) { return String(n).padStart(2,'0'); }
+function fmtShort(d) { return pad2(d.getDate()) + '/' + pad2(d.getMonth()+1); }
+function fmtFull(d) { return fmtShort(d) + '/' + d.getFullYear(); }
+
+function buildWeek(startDate, label) {
+  const days = [];
+  for(let i=0; i<7; i++) {
+    const d = new Date(startDate);
+    d.setDate(startDate.getDate() + i);
+    days.push({ name: DAY_NAMES_AR[d.getDay()], date: fmtShort(d), iso: toISO(d) });
+  }
+  const end = new Date(startDate); end.setDate(startDate.getDate()+6);
+  const range = startDate.getDate() + ' – ' + end.getDate() + ' ' + MONTH_NAMES_AR[end.getMonth()] + ' ' + end.getFullYear();
+  return { label, range, days };
+}
+
+const _now = new Date();
+const _thisStart = getWeekStart(_now);
+const _nextStart = new Date(_thisStart); _nextStart.setDate(_thisStart.getDate()+7);
+const TODAY_ISO = toISO(_now);
+
+// Build growing calendar: from app launch week to next week
+// All weeks before next = locked, only next week = open for input
+const APP_WEEK_START = getWeekStart(new Date('2026-04-12'));
+const WEEKS = [];
+const _wk = new Date(APP_WEEK_START);
+while(_wk <= _nextStart) {
+  const ws = new Date(_wk);
+  const isThis = toISO(ws) === toISO(_thisStart);
+  const isNext = toISO(ws) === toISO(_nextStart);
+  const label  = isThis ? 'هذا الأسبوع' : isNext ? 'الأسبوع القادم' :
+    ws.getDate() + ' ' + MONTH_NAMES_AR[ws.getMonth()] + ' ' + ws.getFullYear();
+  const week = buildWeek(ws, label);
+  week.locked = !isThis && !isNext; // current + next week open
+  WEEKS.push(week);
+  _wk.setDate(_wk.getDate() + 7);
+}
+
+// Update nav date — auto-updates every week (Sun-Sat)
+const _navDate = document.getElementById('navDateDisplay');
+if(_navDate) {
+  const _we = new Date(_thisStart); _we.setDate(_thisStart.getDate()+6);
+  _navDate.textContent = '📅 ' + fmtShort(_thisStart) + ' – ' + fmtShort(_we) + ' / ' + _we.getFullYear();
+}
+// Update dashboard week badge
+const _badge = document.querySelector('.dash-week-badge');
+if(_badge) {
+  const _we = new Date(_thisStart); _we.setDate(_thisStart.getDate()+6);
+  _badge.textContent = 'الأسبوع: ' + _thisStart.getDate() + ' – ' + _we.getDate() + ' ' + MONTH_NAMES_AR[_we.getMonth()] + ' ' + _we.getFullYear();
+}
+
+// calendar events store: { id, iso, title, dept }
+// Next week events — loaded from Sheets on open
+let calEvents = [];
+let calNextId = 100;
+let evEditingId = null;
+let evTargetIso = null;
+let evSelectedColor = 'ev-blue';
+
+function renderCalendar(){
+  const body = document.getElementById('calBody');
+  body.innerHTML = '';
+
+  WEEKS.forEach((week,wi)=>{
+    const block = document.createElement('div');
+    block.className = 'cal-week-block';
+    block.innerHTML = `
+      <div class="cal-week-title ${!week.locked?'next-week':''}">
+        <h2>${week.label} ${week.locked?'<span style="font-size:11px;font-weight:400;opacity:.7;margin-right:8px">— عرض فقط</span>':''}</h2>
+        <span>📅 ${week.range}</span>
+      </div>
+      <div class="cal-grid" id="calgrid-${wi}"></div>`;
+    body.appendChild(block);
+
+    const grid = block.querySelector(`#calgrid-${wi}`);
+    week.days.forEach(day=>{
+      const isToday = day.iso === TODAY_ISO;
+      const isWeek0 = wi===0;
+      const eventPool = isWeek0 ? THIS_WEEK_EVENTS : calEvents;
+      const dayEvents = eventPool.filter(e=>e.iso===day.iso);
+
+      const col = document.createElement('div');
+      col.className = 'cal-day-col' + (isToday?' today':'');
+
+      const evHtml = dayEvents.length
+        ? dayEvents.map(ev=>`
+            <div class="cal-event ${ev.dept==='📢 الأنشطة الإعلامية'?'ev-green':ev.dept==='💬 التواصل الداخلي'?'ev-blue':'ev-amber'}" 
+              ${week.locked ? '' : `onclick="openEditEvent(${ev.id})"`}
+              style="${week.locked?'cursor:default':''}"
+            >
+              <div class="cal-event-title">${ev.title}</div>
+              ${ev.dept?`<div class="cal-event-meta">📁 ${ev.dept.length>16?ev.dept.substring(0,16)+'…':ev.dept}</div>`:''}
+            </div>`).join('')
+        : `<div class="cal-empty">${week.locked?'لا توجد أحداث':'لا توجد أحداث — أضف من الزر أدناه'}</div>`;
+
+      col.innerHTML = `
+        <div class="cal-day-hdr">
+          <span class="cal-day-name">${day.name}</span>
+          <span class="cal-day-num">${day.date.split('/')[0]}</span>
+        </div>
+        <div class="cal-events">${evHtml}</div>
+        <button class="cal-add-btn" onclick="openAddEvent('${day.iso}')" ${week.locked?'style="display:none"':''}>+ إضافة</button>`;
+      grid.appendChild(col);
+    });
+  });
+}
+
+function openAddEvent(iso){
+  evEditingId = null;
+  evTargetIso = iso;
+  document.getElementById('evModalTitle').textContent = 'إضافة حدث';
+  document.getElementById('evTitle').value = '';
+  document.getElementById('evDept').value = '';
+  document.getElementById('evDeleteBtn').style.display = 'none';
+  document.getElementById('evModalOverlay').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('evTitle').focus(),100);
+}
+function openEditEvent(id){
+  const ev = calEvents.find(e=>e.id===id);
+  if(!ev) return;
+  evEditingId = id;
+  evTargetIso = ev.iso;
+  document.getElementById('evModalTitle').textContent = 'تعديل الحدث';
+  document.getElementById('evTitle').value = ev.title;
+  document.getElementById('evDept').value = ev.dept||'';
+  document.getElementById('evDeleteBtn').style.display = 'inline-block';
+  document.getElementById('evModalOverlay').classList.remove('hidden');
+}
+async function saveCalendar() {
+  try {
+    // Save all calEvents — dates are kept exactly as loaded from Sheets
+    const rows = [['id','iso','title','category']];
+    for(const e of calEvents) {
+      // Ensure iso is clean YYYY-MM-DD string
+      const iso = String(e.iso).substring(0,10);
+      rows.push([e.id, iso, e.title, e.dept||'']);
+    }
+    await postWrite('cal_events', rows);
+    saveCalToLocal();
+    showToast('تم حفظ الحدث ✓');
+  } catch(e) { console.warn('saveCalendar:', e.message); }
+}
+
+async function saveEvent(){
+  const titleEl = document.getElementById('evTitle');
+  const deptEl  = document.getElementById('evDept');
+  const title   = titleEl ? titleEl.value.trim() : '';
+  const dept    = deptEl  ? deptEl.value : '';
+  // Auto-detect who added this from their dept selection
+  const myDept  = depts.find(d=>d.id===activeDeptId);
+  const addedBy = myDept ? myDept.owner : (IS_MASTER ? 'المدير' : '');
+  if(!title){ showToast('يرجى إدخال اسم الحدث'); return; }
+  if(evEditingId !== null){
+    const ev = calEvents.find(e=>e.id===evEditingId);
+    if(ev){ ev.title=title; ev.dept=dept; }
+  } else {
+    calEvents.push({ id: calNextId++, iso: evTargetIso, title, dept, addedBy });
+  }
+  closeEvModal();
+  await saveCalendar();
+  renderCalendar();
+}
+async function deleteEvent(){
+  if(evEditingId === null) return;
+  calEvents = calEvents.filter(e=>e.id!==evEditingId);
+  closeEvModal();
+  await saveCalendar();
+  renderCalendar();
+}
+function closeEvModal(){
+  document.getElementById('evModalOverlay').classList.add('hidden');
+  evEditingId = null;
+}
+
+// ── GOOGLE SHEETS SYNC ──
+const GS_URL = 'https://script.google.com/macros/s/AKfycbxfFaG-cRVi2bfTIb8QHS7HscIILHCclqv9ujeQ2ozOPrsErbm65HgsaO_CictYbqM/exec';
+const IS_MASTER = false; // set to true in master version only
+
+// ── Data converters ──
+function deptsToRows() {
+  const rows = [['id','dept_id','dept_name','owner','task_name','status','priority','comment','team','due','updated','next_stage','transferred']];
+  for(const d of depts)
+    for(const t of d.tasks)
+      rows.push([t.id,d.id,d.name,d.owner,t.n,t.s,t.p||'',t.c||'',t.team||'',t.due||'',t.updated||0,t.nextStage||'',t.transferred||'']);
+  return rows;
+}
+function deptToRows(dept) {
+  const rows = [['id','dept_id','dept_name','owner','task_name','status','priority','comment','team','due','updated','next_stage','transferred']];
+  for(const t of dept.tasks)
+    rows.push([t.id,dept.id,dept.name,dept.owner,t.n,t.s,t.p||'',t.c||'',t.team||'',t.due||'',t.updated||0,t.nextStage||'',t.transferred||'']);
+  return rows;
+}
+function rowsToDepts(rows) {
+  if(!rows||rows.length<2) return null;
+  const h=rows[0]; const g=(r,n)=>r[h.indexOf(n)]??'';
+  const map={};
+  for(const d of depts) map[d.id]={...d,tasks:[]};
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i]; if(!g(r,'id')) continue;
+    const did=Number(g(r,'dept_id')); if(!map[did]) continue;
+    const t={id:Number(g(r,'id')),n:String(g(r,'task_name')),s:String(g(r,'status')),
+             p:String(g(r,'priority')),c:String(g(r,'comment')),team:String(g(r,'team')),
+             due:String(g(r,'due')),updated:Number(g(r,'updated'))||0};
+    const ns=g(r,'next_stage'); if(ns) t.nextStage=String(ns);
+    const tr=g(r,'transferred'); if(tr) t.transferred=String(tr);
+    map[did].tasks.push(t);
+  }
+  return Object.values(map);
+}
+function calEventsToRows() {
+  const rows=[['id','iso','title','category','added_by']];
+  for(const e of calEvents) rows.push([e.id,e.iso,e.title,e.dept||'',e.addedBy||'']);
+  return rows;
+}
+function rowsToCalEvents(rows) {
+  if(!rows||rows.length<2) return null;
+  const h=rows[0]; const g=(r,n)=>r[h.indexOf(n)]??'';
+  const res=[];
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i]; if(!g(r,'id')) continue;
+    // Handle all Google Sheets date formats
+    const rawIso = g(r,'iso');
+    let cleanIso = '';
+    if(typeof rawIso === 'number') {
+      // Google Sheets date serial → YYYY-MM-DD
+      const d = new Date(Math.round((rawIso - 25569) * 86400 * 1000));
+      cleanIso = d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');
+    } else if(rawIso instanceof Date) {
+      cleanIso = rawIso.getFullYear()+'-'+String(rawIso.getMonth()+1).padStart(2,'0')+'-'+String(rawIso.getDate()).padStart(2,'0');
+    } else {
+      const s = String(rawIso).trim();
+      // Extract YYYY-MM-DD from any string format
+      const match = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+      cleanIso = match ? match[0] : s.substring(0,10);
+    }
+    if(!cleanIso||cleanIso.length<10) continue;
+    res.push({id:Number(g(r,'id')),iso:cleanIso,title:String(g(r,'title')),dept:String(g(r,'category')||g(r,'dept')||''),addedBy:String(g(r,'added_by')||'')});
+  }
+  return res;
+}
+
+// ── JSONP for reads ──
+function jsonpFetch(url) {
+  return new Promise((resolve,reject) => {
+    const id='gs_'+Math.random().toString(36).slice(2);
+    const s=document.createElement('script');
+    const t=setTimeout(()=>{delete window[id];s.remove();reject(new Error('timeout'));},20000);
+    window[id]=(d)=>{clearTimeout(t);delete window[id];s.remove();resolve(d);};
+    s.src=url+(url.includes('?')?'&':'?')+'callback='+id;
+    document.head.appendChild(s);
+  });
+}
+
+// ── POST for writes ──
+async function postWrite(sheet, rows) {
+  try {
+    // application/x-www-form-urlencoded with no-cors is allowed by CORS rules
+    // Google Apps Script doPost receives this correctly
+    const body = 'sheet=' + encodeURIComponent(sheet) +
+                 '&data=' + encodeURIComponent(JSON.stringify(rows));
+    await fetch(GS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body
+    });
+  } catch(e) { console.warn('postWrite error:', sheet, e.message); }
+}
+
+// Which dept is this user?
+let activeDeptId = null; // null = not selected yet
+
+function getSheetName(deptId) {
+  const d = depts.find(x=>x.id===deptId);
+  return d ? 'dept_'+deptId : null;
+}
+
+let isSyncing = false;
+
+async function saveData() {
+  if(isSyncing) return;
+  isSyncing = true;
+  try {
+    if(IS_MASTER) {
+      // Master: save each dept to its own sheet + tasks master sheet
+      await Promise.all([
+        postWrite('tasks', deptsToRows()),  // Monday sync source for staff
+        ...depts.map(d => postWrite(getSheetName(d.id), deptToRows(d)))
+      ]);
+    } else if(activeDeptId) {
+      // Staff: only save their dept
+      const dept = depts.find(d=>d.id===activeDeptId);
+      if(dept) await postWrite(getSheetName(activeDeptId), deptToRows(dept));
+    }
+    showToast('تم الحفظ ✓');
+  } catch(e) { console.warn('saveData:', e.message); }
+  finally { isSyncing = false; }
+}
+
+async function loadData() {
+  try {
+    showSyncIndicator(true);
+
+    // NOTE: Calendar is NOT loaded here — handled by localStorage in init()
+    // loadData only handles tasks
+
+    if(IS_MASTER) {
+      // Master: load from ALL dept sheets directly and merge into depts
+      const deptSheets = ['dept_1','dept_2','dept_3','dept_4','dept_5','dept_6','dept_7','dept_8','dept_9'];
+      const [calResult, ...deptResults] = await Promise.all([
+        jsonpFetch(GS_URL+'?action=read&sheet=cal_events').catch(()=>null),
+        ...deptSheets.map(s => jsonpFetch(GS_URL+'?action=read&sheet='+s).catch(()=>null))
+      ]);
+      // Load calendar for Master — all events from Sheets
+      console.log('CAL RESULT:', JSON.stringify(calResult));
+      if(calResult&&calResult.ok&&calResult.data&&calResult.data.length>1) {
+        const loadedCal = rowsToCalEvents(calResult.data);
+        console.log('LOADED CAL:', loadedCal);
+        if(loadedCal&&loadedCal.length>0) {
+          calEvents = loadedCal;
+          calNextId = Math.max(...calEvents.map(e=>e.id),99)+1;
+        }
+      }
+      // Load tasks from dept sheets
+      let anyLoaded = false;
+      deptResults.forEach(td => {
+        if(td&&td.ok&&td.data&&td.data.length>1) {
+          const h = td.data[0];
+          const deptIdIdx = h.indexOf('dept_id');
+          const taskNameIdx = h.indexOf('task_name');
+          if(deptIdIdx===-1||taskNameIdx===-1) return;
+          // Group rows by dept_id
+          const rowsByDept = {};
+          td.data.slice(1).forEach(row => {
+            const did = Number(row[deptIdIdx]);
+            if(!did) return;
+            if(!rowsByDept[did]) rowsByDept[did] = [];
+            rowsByDept[did].push(row);
+          });
+          Object.keys(rowsByDept).forEach(did => {
+            const idx = depts.findIndex(d=>d.id===Number(did));
+            if(idx===-1) return;
+            const fakeRows = [h, ...rowsByDept[did]];
+            const loaded = rowsToDepts(fakeRows);
+            if(loaded) loaded.forEach(ld=>{
+              if(ld.tasks.length>0 && ld.id===Number(did)) {
+                depts[idx].tasks = ld.tasks;
+                anyLoaded = true;
+              }
+            });
+          });
+          const maxId = Math.max(...td.data.slice(1).map(r=>Number(r[0])||0).filter(Boolean),0);
+          if(maxId>nextId) nextId=maxId+1;
+        }
+      });
+      if(anyLoaded) console.log('Master: loaded from all dept sheets');
+    } else if(activeDeptId) {
+      // Check if today is Monday and we haven't synced from master yet this Monday
+      const today    = new Date();
+      const isMonday = today.getDay() === 1;
+      const mondayKey = 'wm_last_monday_sync';
+      const todayStr  = today.toISOString().split('T')[0];
+      const lastSync  = localStorage.getItem(mondayKey) || '';
+      const shouldSyncFromMaster = isMonday && lastSync !== todayStr;
+
+      if(shouldSyncFromMaster) {
+        // Monday sync: load full master tasks sheet to get all latest data
+        showToast('تحديث أسبوعي — جاري تحميل آخر البيانات...');
+        const td = await jsonpFetch(GS_URL+'?action=read&sheet=tasks');
+        if(td&&td.ok&&td.data&&td.data.length>1) {
+          const loaded = rowsToDepts(td.data);
+          if(loaded) {
+            loaded.forEach(ld=>{
+              const idx=depts.findIndex(d=>d.id===ld.id);
+              if(idx!==-1) depts[idx].tasks=ld.tasks;
+            });
+            // Save this dept back to dept_X sheet so future loads are fast
+            const dept = depts.find(d=>d.id===activeDeptId);
+            if(dept) postWrite(getSheetName(activeDeptId), deptToRows(dept));
+            // Mark sync done for today
+            localStorage.setItem(mondayKey, todayStr);
+            showToast('✅ تم تحديث البيانات من نسخة المدير');
+          }
+        }
+      } else {
+        // Load ALL dept sheets so everyone sees everyone's updates
+        const allDeptSheets = ['dept_1','dept_2','dept_3','dept_4','dept_5','dept_6','dept_7','dept_8','dept_9'];
+        const results = await Promise.all(
+          allDeptSheets.map(s => jsonpFetch(GS_URL+'?action=read&sheet='+s).catch(()=>null))
+        );
+        results.forEach(td => {
+          if(td&&td.ok&&td.data&&td.data.length>1) {
+            const loaded=rowsToDepts(td.data);
+            if(loaded) {
+              loaded.forEach(ld=>{
+                if(ld.tasks.length>0) {
+                  const idx=depts.findIndex(d=>d.id===ld.id);
+                  if(idx!==-1) depts[idx].tasks=ld.tasks;
+                }
+              });
+            }
+          }
+        });
+      }
+    }
+  } catch(e) { console.warn('loadData:', e.message); }
+  finally { showSyncIndicator(false); }
+}
+
+// Dept selector overlay
+function showDeptSelector() {
+  const overlay = document.createElement('div');
+  overlay.id = 'deptSelector';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(13,26,19,.95);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;font-family:Tajawal,sans-serif';
+  overlay.innerHTML = `
+    <div style="color:#B59D61;font-size:22px;font-weight:800;margin-bottom:8px">اختر قسمك</div>
+    <div style="color:#7a9e8e;font-size:14px;margin-bottom:16px">ستتمكن من تعديل مهام قسمك فقط</div>
+    <div style="display:flex;flex-direction:column;gap:10px;width:320px">
+      ${depts.map(d=>`<button onclick="selectDept(${d.id})" style="font-family:Tajawal,sans-serif;background:#0d4a2f;color:#fff;border:1px solid #B59D61;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;text-align:right">${d.id}. ${d.name} — ${d.owner}</button>`).join('')}
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+async function selectDept(id) {
+  activeDeptId = id;
+  try { localStorage.setItem('wm_my_dept', id); } catch(e) {}
+  const overlay = document.getElementById('deptSelector');
+  if(overlay) overlay.remove();
+  lockOtherDepts(id);
+  showSyncIndicator(false);
+  // Show user badge in nav
+  const dept = depts.find(d=>d.id===id);
+  if(dept && !IS_MASTER) {
+    const badge = document.getElementById('userBadge');
+    const badgeText = document.getElementById('userBadgeText');
+    if(badge) badge.style.display = 'flex';
+    if(badgeText) badgeText.textContent = '👤 ' + dept.owner + ' — ' + dept.name;
+  }
+  await loadData();
+  renderDash();
+  renderTracker();
+  renderCalendar();
+}
+
+function changeDept() {
+  // Clear saved dept and show selector again
+  try { localStorage.removeItem('wm_my_dept'); } catch(e) {}
+  const badge = document.getElementById('userBadge');
+  if(badge) badge.style.display = 'none';
+  activeDeptId = null;
+  window._myDeptId = null;
+  showDeptSelector();
+}
+
+async function syncFromMaster(btn) {
+  if(btn) { btn.disabled=true; btn.textContent='⏳ جاري التحديث...'; }
+  try {
+    showSyncIndicator(true);
+    const td = await jsonpFetch(GS_URL+'?action=read&sheet=tasks');
+    if(td&&td.ok&&td.data&&td.data.length>1) {
+      const loaded = rowsToDepts(td.data);
+      if(loaded) {
+        loaded.forEach(ld=>{
+          const idx=depts.findIndex(d=>d.id===ld.id);
+          if(idx!==-1) depts[idx].tasks=ld.tasks;
+        });
+        if(activeDeptId) {
+          const dept = depts.find(d=>d.id===activeDeptId);
+          if(dept) postWrite(getSheetName(activeDeptId), deptToRows(dept));
+        }
+        try { localStorage.setItem('wm_last_monday_sync', new Date().toISOString().split('T')[0]); } catch(e){}
+        showToast('✅ تم التحديث من نسخة المدير');
+        renderDash();
+        renderTracker();
+      }
+    } else {
+      showToast('لا توجد بيانات في نسخة المدير بعد');
+    }
+  } catch(e) { showToast('خطأ في التحديث'); }
+  finally {
+    showSyncIndicator(false);
+    if(btn) { btn.disabled=false; btn.textContent='🔄 تحديث من المدير'; }
+  }
+}
+
+async function consolidateAll(btn) {
+  if(!IS_MASTER) return;
+  if(btn) { btn.disabled=true; btn.textContent='⏳ جاري الدمج...'; }
+  try {
+    showSyncIndicator(true);
+    // 1. Load all dept sheets
+    const deptSheets = ['dept_1','dept_2','dept_3','dept_4','dept_5','dept_6','dept_7','dept_8','dept_9'];
+    const results = await Promise.all(
+      deptSheets.map(s => jsonpFetch(GS_URL+'?action=read&sheet='+s).catch(()=>null))
+    );
+    results.forEach(td => {
+      if(td&&td.ok&&td.data&&td.data.length>1) {
+        const loaded = rowsToDepts(td.data);
+        if(loaded) loaded.forEach(ld=>{
+          if(ld.tasks.length>0) {
+            const idx=depts.findIndex(d=>d.id===ld.id);
+            if(idx!==-1) depts[idx].tasks=ld.tasks;
+          }
+        });
+      }
+    });
+    // 2. Save merged data to tasks sheet + all dept sheets
+    await Promise.all([
+      postWrite('tasks', deptsToRows()),
+      ...depts.map(d => postWrite(getSheetName(d.id), deptToRows(d)))
+    ]);
+    renderDash();
+    renderTracker();
+    showToast('✅ تم دمج وحفظ كل الأقسام في tasks sheet');
+  } catch(e) {
+    showToast('خطأ في الدمج');
+    console.warn('consolidateAll:', e);
+  } finally {
+    showSyncIndicator(false);
+    if(btn) { btn.disabled=false; btn.textContent='🔗 دمج وحفظ الكل'; }
+  }
+}
+
+async function masterReload(btn) {
+  if(!IS_MASTER) return;
+  if(btn) { btn.textContent='⏳'; btn.disabled=true; }
+  await loadData();
+  renderDash();
+  renderTracker();
+  renderCalendar();
+  showToast('✅ تم تحديث البيانات');
+  if(btn) { btn.textContent='🔄 تحديث'; btn.disabled=false; }
+}
+
+// Add reload button to nav for Master only (done via JS so IS_MASTER is evaluated correctly)
+if(IS_MASTER) {
+  const navTabs = document.getElementById('navTabs');
+  if(navTabs) {
+    const btn = document.createElement('button');
+    btn.className = 'nav-tab';
+    btn.style.color = '#B59D61';
+    btn.textContent = '🔄 تحديث';
+    btn.onclick = function(){ masterReload(this); };
+    navTabs.appendChild(btn);
+  }
+}
+
+function lockOtherDepts(myDeptId) {
+  // Store which dept is mine so the tracker can lock others
+  window._myDeptId = myDeptId;
+}
+
+function showSyncIndicator(show) {
+  const nav = document.getElementById('syncIndicator');
+  if(nav) nav.style.display = show ? 'flex' : 'none';
+  const overlay = document.getElementById('loadingOverlay');
+  if(overlay) overlay.classList.toggle('hidden', !show);
+}
+
+// On load: always load calendar first, then show dept selector for staff
+// This week's events are hardcoded — never loaded from or saved to Sheets
+const THIS_WEEK_ISOS = ['2026-04-12','2026-04-13','2026-04-14','2026-04-15','2026-04-16','2026-04-17','2026-04-18'];
+const THIS_WEEK_EVENTS = [
+  {id:1, iso:'2026-04-13', title:'نشر خبر انضمام الهيئة الملكية شريكاً استراتيجياً لمنتدى الاستثمار الرياضي', dept:'📢 الأنشطة الإعلامية'},
+  {id:2, iso:'2026-04-13', title:'نشر خبر إعلان فرص استثمارية في حقوق تسمية محطات قطار الرياض', dept:'📢 الأنشطة الإعلامية'},
+  {id:3, iso:'2026-04-13', title:'إعلان تسمية المحطات — منشورات التواصل الاجتماعي والبيان الصحفي', dept:'📢 الأنشطة الإعلامية'},
+  {id:4, iso:'2026-04-15', title:'تحويلة تقاطع طريق الثمامة مع طريق عثمان بن عفان', dept:'📢 الأنشطة الإعلامية'},
+  {id:5, iso:'2026-04-15', title:'رياض آرت — 75 عمل فني', dept:'📢 الأنشطة الإعلامية'},
+  {id:6, iso:'2026-04-16', title:'زيارة المحطة الغربية لقطار الرياض', dept:'📢 الأنشطة الإعلامية'},
+  {id:7, iso:'2026-04-16', title:'اليوم العالمي للنقل', dept:'📢 الأنشطة الإعلامية'},
+  {id:8, iso:'2026-04-12', title:'تقرير الرصد والتحليل الأسبوعي', dept:'📌 أخرى'},
+  {id:9, iso:'2026-04-15', title:'تقرير مركز الاتصال', dept:'📌 أخرى'},
+];
+
+const LS_CAL = 'wm_cal_next_week';
+
+function saveCalToLocal() {
+  try { localStorage.setItem(LS_CAL, JSON.stringify(calEvents)); } catch(e) {}
+}
+function loadCalFromLocal() {
+  try {
+    const s = localStorage.getItem(LS_CAL);
+    if(s) { const d=JSON.parse(s); if(d&&d.length>0) return d; }
+  } catch(e) {}
+  return null;
+}
+
+// ── PASSWORD ──
+const CORRECT_PW = 'RCRCMEDIA';
+function checkPassword() {
+  const val = document.getElementById('pwInput').value.trim();
+  if(val === CORRECT_PW) {
+    document.getElementById('passwordScreen').classList.add('hidden');
+    document.getElementById('pwInput').value = '';
+    try { localStorage.setItem('wm_auth', '1'); } catch(e) {}
+    init(); // only start the app after correct password
+  } else {
+    const err = document.getElementById('pwError');
+    err.textContent = '❌ كلمة المرور غير صحيحة';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+    setTimeout(()=>{ err.textContent=''; }, 2500);
+  }
+}
+// If already authenticated, hide password screen and start normally
+const _alreadyAuthed = localStorage.getItem('wm_auth') === '1';
+if(_alreadyAuthed) {
+  document.getElementById('passwordScreen').classList.add('hidden');
+}
+
+async function init() {
+  // Load calendar from Sheets so everyone sees the same events
+  try {
+    const cd = await jsonpFetch(GS_URL+'?action=read&sheet=cal_events');
+    if(cd&&cd.ok&&cd.data&&cd.data.length>1) {
+      const loaded = rowsToCalEvents(cd.data);
+      if(loaded&&loaded.length>0) {
+        calEvents = loaded;
+        calNextId = Math.max(...calEvents.map(e=>e.id),99)+1;
+        saveCalToLocal();
+      }
+    } else {
+      // Sheets empty — use localStorage backup
+      const local = loadCalFromLocal();
+      if(local&&local.length>0) { calEvents=local; calNextId=Math.max(...calEvents.map(e=>e.id),99)+1; }
+    }
+  } catch(e) {
+    // Network fail — use localStorage
+    const local = loadCalFromLocal();
+    if(local&&local.length>0) { calEvents=local; calNextId=Math.max(...calEvents.map(e=>e.id),99)+1; }
+  }
+
+  renderDash();
+  renderTracker();
+  renderCalendar();
+
+  if(!IS_MASTER) {
+    const savedDept = localStorage.getItem('wm_my_dept');
+    if(savedDept) {
+      await selectDept(Number(savedDept));
+    } else {
+      showDeptSelector();
+    }
+  } else {
+    loadData().then(() => {
+      renderDash();
+      renderTracker();
+      renderCalendar();
+    });
+  }
+}
+// Only auto-start if already authenticated — otherwise wait for password
+if(_alreadyAuthed) { init(); }
+
+function showPage(page,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  btn.classList.add('active');
+  // Just re-render with current in-memory data — no re-read from Sheets
+  if(page==='dash') renderDash();
+  else if(page==='tracker') renderTracker();
+  else if(page==='calendar') renderCalendar();
+}
+</script>
+</body>
+</html>
